@@ -1,26 +1,52 @@
+@import url("https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;700&family=Red+Hat+Text:wght@400;700&display=swap");
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
 :root {
   --background: #ffffff;
   --foreground: #171717;
-}
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-carrot: #c87d21;
+  --color-sand: #9d6e34;
+  --color-orange: #f28500;
+  --color-coffee: #483d30;
+  --color-mud: #735939;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
+
+    --color-carrot: #f28500;
+    --color-sand: #c87d21;
+    --color-orange: #c87d21;
+    --color-coffee: #9d6e34;
+    --color-mud: #483d30;
   }
+}
+
+@theme inline {
+  --font-sans: "Red Hat Text", system-ui, sans-serif;
+  --font-display: "Red Hat Display", system-ui, sans-serif;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  --color-carrot: var(--color-carrot);
+  --color-sand: var(--color-sand);
+  --color-orange: var(--color-orange);
+  --color-coffee: var(--color-coffee);
+  --color-mud: var(--color-mud);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+}
+
+h1,
+h2 {
+  font-family: var(--font-display);
 }
