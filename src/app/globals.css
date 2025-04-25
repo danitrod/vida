@@ -19,6 +19,23 @@
   --color-foreground: var(--foreground);
 }
 
+@layer utilities {
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  .animate-fadeIn {
+    animation: fadeIn 0.15s ease-out forwards;
+  }
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
@@ -28,4 +45,8 @@ body {
 h1,
 h2 {
   font-family: var(--font-display);
+}
+
+button {
+  cursor: pointer;
 }

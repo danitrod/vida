@@ -1,16 +1,9 @@
 import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
-import { remark } from "remark";
-import html from "remark-html";
 import { Metadata } from "next";
-
-type Post = {
-  title: string;
-  excerpt: string;
-  date: string;
-  content: string;
-};
+import { formatDate } from "@/lib/date";
+import ReactMarkdown from "react-markdown";
 
 const postsDir = path.join(process.cwd(), "src/content/posts");
 
@@ -42,16 +35,16 @@ export default async function PostPage(props: {
   const fileContent = fs.readFileSync(filePath, "utf8");
 
   const { data, content } = matter(fileContent);
-  const processedContent = await remark().use(html).process(content);
-  const contentHtml = processedContent.toString();
 
   return (
-    <main className="min-h-screen px-4 py-16 sm:px-8 md:px-16 lg:px-32 bg-[var(--background)] text-[var(--foreground)]">
+    <main className="min-h-screen px-4 py-8 sm:px-8 md:px-16 lg:px-32 bg-[var(--background)] text-[var(--foreground)]">
       <article className="max-w-3xl mx-auto">
         <h1 className="text-4xl font-extrabold tracking-tight text-[var(--color-carrot)] mb-2">
           {data.title}
         </h1>
-        <p className="text-sm text-[var(--color-sand)] mb-8">{data.date}</p>
+        <p className="text-sm text-[var(--color-sand)] mb-8">
+          {formatDate(data.date)}
+        </p>
         <div
           className="prose prose-lg dark:prose-invert prose-neutral"
           style={
@@ -65,8 +58,22 @@ export default async function PostPage(props: {
               "--tw-prose-quote-borders": "var(--color-sand)",
             } as React.CSSProperties
           }
-          dangerouslySetInnerHTML={{ __html: contentHtml }}
-        />
+        >
+          <ReactMarkdown
+            components={{
+              a: ({ node, ...props }) => (
+                <a
+                  {...props}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[var(--color-orange)] underline hover:opacity-80"
+                />
+              ),
+            }}
+          >
+            {content}
+          </ReactMarkdown>
+        </div>
       </article>
     </main>
   );

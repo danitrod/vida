@@ -13,11 +13,11 @@ export default function Modal({ isOpen, onCloseAction, children }: ModalProps) {
 
   return (
     <div
-      className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center"
+      className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center transition-opacity duration-150"
       onClick={onCloseAction}
     >
       <div
-        className="bg-white p-6 rounded shadow max-w-sm w-full"
+        className="bg-white p-6 rounded shadow max-w-sm w-full transform transition-all duration-150 scale-95 opacity-0 animate-fadeIn"
         onClick={(e) => e.stopPropagation()}
       >
         {children}

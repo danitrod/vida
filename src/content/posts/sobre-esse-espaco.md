@@ -1,0 +1,32 @@
+---
+title: "Sobre esse espaço"
+excerpt: "Uma breve introdução a esse espaço, e minha relação com a escrita."
+date: "2025-04-25"
+---
+
+Conforme os anos vão passando, o meu gosto por escrever vai aumentando. Despretensiosamente, vou
+anotando no meu bloco de notas e, sem me dar conta, ele vai crescendo. Seja sobre o que for:
+banalidades do dia a dia, reflexões, aprendizados, histórias. Dessas notas, não me lembro de alguma
+que tenha sido compartilhada com o mundo externo.
+
+Tenho focado ultimamente muito em trabalho. Ele acaba sendo uma parte importante da vida; querendo
+ou não considero que dependo dele pra viver. E venho escrevendo um pouco mais relacionado a
+trabalho (em inglês) no [meu blog](https://danitrod.dev). Mas tenho plena consciência de que a vida
+é sobre muito mais do que trabalho (e o dinheiro que ele nos dá). No meu caso, pelo menos, por
+trabalhar com algo tão ligado à tecnologia, e ter de pensar de maneira tão abstrata nele, essa
+separação entre trabalho e vida pessoal fica bem evidente. Talvez por isso me identifique
+tanto com a série [Ruptura](<https://pt.wikipedia.org/wiki/Severance_(s%C3%A9rie_de_televis%C3%A3o)>).
+
+Bom, a ideia deste espaço é eu compartilhar um pouco não só dessas notas, mas sobre meus pensamentos
+e experiências, não tão relacionados a trabalho, mas sobre temas mais filosóficos, psicológicos, ou
+até cômicos. Quem sabe possa abrir aqui também um diálogo com quem tiver interesse. Estou deixando
+uma seção de comentários em cada post para isso. Será possível comentar tanto anonimamente
+quanto registrando uma conta.
+
+Os anos se passam, a vida vai passando, e muito vai sendo esquecido. Acho que a gente precisa fazer
+um esforço para o que é importante ser lembrado. E não que minhas experiências pessoais sejam lá tão
+importantes, mas tenho certeza de que elas têm seu valor. E se eu puder contribuir um pouco das
+minhas experiências como legado pra algo maior, será meu prazer.
+
+Acho que o gosto por escrever tem muito a ver com esse desejo de contribuir para esse "algo maior".
+Apesar de ainda não saber descrever muito bem o que ele é.

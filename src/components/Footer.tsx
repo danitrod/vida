@@ -2,7 +2,7 @@ import { FaInstagram } from "react-icons/fa";
 
 export default function Footer() {
   return (
-    <footer className="mt-8 text-center">
+    <footer className="my-4 lg:my-8 text-center">
       <hr className="my-4 border-gray-200" />
       <a
         href="https://www.instagram.com/danitrod"

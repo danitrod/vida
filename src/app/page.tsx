@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Metadata } from "next";
+import { getAllPosts } from "@/lib/posts";
 
 export const metadata: Metadata = {
   title: "vida — por danitrod",
@@ -7,28 +8,11 @@ export const metadata: Metadata = {
     "Reflexões pessoais, experimentos de estilo de vida e pensamentos de baixa tecnologia.",
 };
 
-const samplePosts = [
-  {
-    title: "Estamos vivendo uma revolução",
-    slug: "cafe-da-manha-sem-pressa",
-    excerpt: "Como desacelerar sua manhã pode transformar o resto do seu dia.",
-  },
-  {
-    title: "Desplugando no fim de semana",
-    slug: "desplugando-no-fim-de-semana",
-    excerpt:
-      "Experimentos com finais de semana sem tela e como isso mudou minha relação com o tempo.",
-  },
-  {
-    title: "O poder de uma caminhada solitária",
-    slug: "caminhada-solitaria",
-    excerpt: "Reflexões sobre silêncio, observação e presença.",
-  },
-];
+export default async function Home() {
+  const posts = await getAllPosts();
 
-export default function Home() {
   return (
-    <main className="px-4 py-16 sm:px-8 md:px-16 lg:px-32 ">
+    <main className="px-4 py-8 sm:px-8 md:px-16 lg:px-32 ">
       <div className="max-w-2xl mx-auto">
         <h1 className="text-4xl font-bold mb-2">
           vida <span className="text-2xl font-light">by danitrod</span>
@@ -38,7 +22,7 @@ export default function Home() {
         </p>
 
         <ul className="space-y-8">
-          {samplePosts.map((post) => (
+          {posts.map((post) => (
             <li key={post.slug}>
               <Link
                 href={`/posts/${post.slug}`}

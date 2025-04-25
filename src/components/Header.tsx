@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Modal from "./Modal";
+import Link from "next/link";
 
 export default function Header() {
   const [showModal, setShowModal] = useState(false);
@@ -13,7 +14,11 @@ export default function Header() {
   };
 
   return (
-    <header className="flex justify-end mb-16">
+    <header className="sticky top-0 z-40 flex bg-background justify-between mb-8 px-4 py-4 border-b border-gray-200">
+      <Link href="/" className="font-bold">
+        vida
+      </Link>
+
       <button
         onClick={() => setShowModal(true)}
         className="text-sm hover:underline"
