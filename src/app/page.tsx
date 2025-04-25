@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { Metadata } from "next";
-import ThemeToggle from "@/components/ThemeToggle";
 
 export const metadata: Metadata = {
   title: "vida — por danitrod",
@@ -10,7 +9,7 @@ export const metadata: Metadata = {
 
 const samplePosts = [
   {
-    title: "Café da manhã sem pressa",
+    title: "Estamos vivendo uma revolução",
     slug: "cafe-da-manha-sem-pressa",
     excerpt: "Como desacelerar sua manhã pode transformar o resto do seu dia.",
   },
@@ -29,69 +28,28 @@ const samplePosts = [
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-[var(--background)] text-[var(--foreground)] px-4 py-16 sm:px-8 md:px-16 lg:px-32">
-      <div className="max-w-3xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight text-[var(--color-carrot)]">
-            vida
-          </h1>
-          <ThemeToggle />
-        </div>
-
-        <p className="text-lg sm:text-xl mb-8">
-          Um blog pessoal sobre estilo de vida, simplicidade e as pequenas
-          alegrias do cotidiano. Curado por{" "}
-          <span className="font-semibold text-[var(--color-orange)]">
-            danitrod
-          </span>
-          .
+    <main className="px-4 py-16 sm:px-8 md:px-16 lg:px-32 ">
+      <div className="max-w-2xl mx-auto">
+        <h1 className="text-4xl font-bold mb-2">
+          vida <span className="text-2xl font-light">by danitrod</span>
+        </h1>
+        <p className="text-lg mb-12">
+          Pensamentos e histórias tirados de um bloco de notas.
         </p>
 
-        <Link
-          href="/posts"
-          className="inline-block bg-[var(--color-orange)] text-white px-6 py-3 rounded-full shadow hover:bg-[var(--color-carrot)] transition mb-12"
-        >
-          Ler posts
-        </Link>
-
-        <section>
-          <h2 className="text-2xl font-bold text-[var(--color-carrot)] mb-6">
-            Últimos posts
-          </h2>
-          <ul className="space-y-6">
-            {samplePosts.map((post) => (
-              <li
-                key={post.slug}
-                className="border-l-4 border-[var(--color-orange)] pl-4"
+        <ul className="space-y-8">
+          {samplePosts.map((post) => (
+            <li key={post.slug}>
+              <Link
+                href={`/posts/${post.slug}`}
+                className="text-xl font-medium underline underline-offset-4"
               >
-                <Link
-                  href={`/posts/${post.slug}`}
-                  className="text-xl font-semibold hover:text-[var(--color-carrot)]"
-                >
-                  {post.title}
-                </Link>
-                <p className="text-[var(--color-sand)] text-sm mt-1">
-                  {post.excerpt}
-                </p>
-              </li>
-            ))}
-          </ul>
-        </section>
-
-        <div className="mt-16 border-t pt-8 text-sm text-[var(--color-sand)]">
-          <p>
-            Hospedado em{" "}
-            <a
-              href="https://vida.danitrod.dev"
-              className="underline hover:text-[var(--color-orange)]"
-            >
-              Vercel
-            </a>
-          </p>
-          <p>
-            Feito com <span className="text-red-400">♥</span> e Next.js.
-          </p>
-        </div>
+                {post.title}
+              </Link>
+              <p className="text-sm text-gray-600 mt-1">{post.excerpt}</p>
+            </li>
+          ))}
+        </ul>
       </div>
     </main>
   );
