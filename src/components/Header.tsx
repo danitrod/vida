@@ -34,7 +34,11 @@ export default function Header({ initialTheme }: HeaderProps) {
         </button>
       </div>
 
-      <Modal isOpen={showModal} onCloseAction={closeModal}>
+      <Modal
+        isOpen={showModal}
+        onCloseAction={closeModal}
+        className="bg-background"
+      >
         {isRegistering ? (
           <>
             <h2 className="text-xl font-bold mb-4">Criar conta</h2>
@@ -51,7 +55,7 @@ export default function Header({ initialTheme }: HeaderProps) {
               />
               <button
                 type="submit"
-                className="w-full bg-black text-white py-2 rounded text-sm"
+                className="w-full bg-[var(--color-accent)] text-foreground py-2 rounded text-sm font-bold"
               >
                 Registrar
               </button>
@@ -81,7 +85,7 @@ export default function Header({ initialTheme }: HeaderProps) {
               />
               <button
                 type="submit"
-                className="w-full bg-black text-white py-2 rounded text-sm"
+                className="w-full bg-[var(--color-accent)] text-foreground py-2 rounded text-sm font-bold"
               >
                 entrar
               </button>

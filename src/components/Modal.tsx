@@ -5,10 +5,16 @@ import { ReactNode } from "react";
 type ModalProps = {
   isOpen: boolean;
   onCloseAction: () => void;
+  className?: string;
   children: ReactNode;
 };
 
-export default function Modal({ isOpen, onCloseAction, children }: ModalProps) {
+export default function Modal({
+  isOpen,
+  onCloseAction,
+  className,
+  children,
+}: ModalProps) {
   if (!isOpen) return null;
 
   return (
@@ -17,7 +23,7 @@ export default function Modal({ isOpen, onCloseAction, children }: ModalProps) {
       onClick={onCloseAction}
     >
       <div
-        className="bg-white p-6 rounded shadow max-w-sm w-full transform transition-all duration-150 scale-95 opacity-0 animate-fadeIn"
+        className={`p-6 rounded shadow max-w-sm w-full transform transition-all duration-150 scale-95 opacity-0 animate-fadeIn ${className}`}
         onClick={(e) => e.stopPropagation()}
       >
         {children}
