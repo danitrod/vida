@@ -30,7 +30,7 @@ export default async function Home() {
               >
                 {post.title}
               </Link>
-              <p className="text-sm text-gray-600 mt-1">{post.excerpt}</p>
+              <p className="text-sm mt-1">{post.excerpt}</p>
             </li>
           ))}
         </ul>

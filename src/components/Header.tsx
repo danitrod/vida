@@ -3,8 +3,13 @@
 import { useState } from "react";
 import Modal from "./Modal";
 import Link from "next/link";
+import ThemeToggle, { Theme } from "./ThemeToggle";
 
-export default function Header() {
+type HeaderProps = {
+  initialTheme?: Theme;
+};
+
+export default function Header({ initialTheme }: HeaderProps) {
   const [showModal, setShowModal] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
 
@@ -14,17 +19,20 @@ export default function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-40 flex bg-background justify-between mb-8 px-4 py-4 border-b border-gray-200">
+    <header className="sticky top-0 z-40 flex bg-background justify-between mb-8 px-4 py-4 border-b border-[var(--color-soft)]">
       <Link href="/" className="font-bold">
         vida
       </Link>
 
-      <button
-        onClick={() => setShowModal(true)}
-        className="text-sm hover:underline"
-      >
-        login
-      </button>
+      <div className="flex items-center gap-4">
+        <ThemeToggle initialTheme={initialTheme} />
+        <button
+          onClick={() => setShowModal(true)}
+          className="text-sm hover:underline"
+        >
+          login
+        </button>
+      </div>
 
       <Modal isOpen={showModal} onCloseAction={closeModal}>
         {isRegistering ? (
@@ -78,7 +86,7 @@ export default function Header() {
                 entrar
               </button>
             </form>
-            <p className="mt-4 text-sm text-center">
+            <p className="mt-8 text-sm text-center">
               <button
                 onClick={() => setIsRegistering(true)}
                 className="underline text-gray-700"
