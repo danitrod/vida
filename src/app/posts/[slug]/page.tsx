@@ -4,6 +4,7 @@ import matter from "gray-matter";
 import { Metadata } from "next";
 import { formatDate } from "@/lib/date";
 import ReactMarkdown from "react-markdown";
+import { FaExternalLinkAlt } from "react-icons/fa";
 
 const postsDir = path.join(process.cwd(), "src/content/posts");
 
@@ -61,13 +62,19 @@ export default async function PostPage(props: {
         >
           <ReactMarkdown
             components={{
-              a: ({ node, ...props }) => (
+              a: ({ node, children, ...props }) => (
                 <a
                   {...props}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-[var(--color-orange)] underline hover:opacity-80"
-                />
+                  className="text-[var(--color-orange)] underline hover:opacity-80 whitespace-nowrap"
+                >
+                  {children}
+                  <FaExternalLinkAlt
+                    className="inline-block -mt-1 ml-1"
+                    size={8}
+                  />
+                </a>
               ),
             }}
           >
