@@ -7,15 +7,21 @@
 :root {
   --background: #fefcf8;
   --foreground: #2f2f2f;
+
   --color-accent: #fa7850;
-  --color-soft: #ecedef;
+  --accent-hover: #f9623a;
+  --accent-active: #d84e2b;
+
+  --color-soft: #fdd7c5;
+
+  --color-light: #ecedef;
 }
 
 .dark {
   --background: #1a1a1a;
   --foreground: #fefcf8;
   --color-accent: #fa7850;
-  --color-soft: #343536;
+  --color-light: #343536;
 }
 
 @theme inline {
@@ -24,6 +30,16 @@
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+}
+
+@layer components {
+  .btn {
+    @apply bg-[var(--color-accent)] text-background py-2 rounded text-sm font-bold transition-colors duration-200 ease-in-out hover:bg-[var(--accent-hover)] active:bg-[var(--accent-active)] dark:text-foreground;
+  }
+
+  .btn-secondary {
+    @apply bg-[var(--color-soft)] text-foreground py-2 rounded text-sm font-bold;
+  }
 }
 
 @layer utilities {
@@ -43,17 +59,19 @@
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-sans);
-}
+@layer base {
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+  }
 
-h1,
-h2 {
-  font-family: var(--font-display);
-}
+  h1,
+  h2 {
+    font-family: var(--font-display);
+  }
 
-button {
-  cursor: pointer;
+  button {
+    cursor: pointer;
+  }
 }

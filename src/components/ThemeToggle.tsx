@@ -10,7 +10,6 @@ type ThemeToggleProps = {
 };
 
 const ThemeToggle = ({ initialTheme }: ThemeToggleProps) => {
-  console.log("Initial theme:", initialTheme);
   const [theme, setTheme] = useState<Theme | undefined>(initialTheme);
 
   const toggleTheme = () => {

@@ -1,106 +1,87 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Modal from "./Modal";
 import Link from "next/link";
 import ThemeToggle, { Theme } from "./ThemeToggle";
+import { RegistrationForm } from "./forms/Registration";
+import { LoginForm } from "./forms/Login";
+import { useUser } from "@/context/UserContext";
+import Spinner from "./Spinner";
+import { Settings } from "./forms/Settings";
 
 type HeaderProps = {
   initialTheme?: Theme;
 };
 
 export default function Header({ initialTheme }: HeaderProps) {
-  const [showModal, setShowModal] = useState(false);
-  const [isRegistering, setIsRegistering] = useState(false);
+  const { user, isLoading } = useUser();
+  const [modalContent, setModalContent] = useState<string | null>(null);
 
   const closeModal = () => {
-    setShowModal(false);
-    setIsRegistering(false);
+    setModalContent(null);
   };
 
+  let modal;
+  switch (modalContent) {
+    case "login":
+      modal = (
+        <Modal onCloseAction={closeModal} className="bg-background">
+          <LoginForm
+            onSwitch={() => setModalContent("register")}
+            onClose={closeModal}
+          />
+        </Modal>
+      );
+      break;
+    case "register":
+      modal = (
+        <Modal onCloseAction={closeModal} className="bg-background">
+          <RegistrationForm
+            onSwitch={() => setModalContent("login")}
+            onClose={closeModal}
+          />
+        </Modal>
+      );
+      break;
+    case "settings":
+      modal = (
+        <Modal onCloseAction={closeModal} className="bg-background">
+          <Settings onClose={closeModal} />
+        </Modal>
+      );
+      break;
+    default:
+      modal = null;
+  }
+
   return (
-    <header className="sticky top-0 z-40 flex bg-background justify-between mb-8 px-4 py-4 border-b border-[var(--color-soft)]">
+    <header className="sticky top-0 z-40 flex bg-background justify-between mb-8 px-4 py-4 border-b border-[var(--color-light)]">
       <Link href="/" className="font-bold">
         vida
       </Link>
 
       <div className="flex items-center gap-4">
         <ThemeToggle initialTheme={initialTheme} />
-        <button
-          onClick={() => setShowModal(true)}
-          className="text-sm hover:underline"
-        >
-          login
-        </button>
-      </div>
-
-      <Modal
-        isOpen={showModal}
-        onCloseAction={closeModal}
-        className="bg-background"
-      >
-        {isRegistering ? (
-          <>
-            <h2 className="text-xl font-bold mb-4">Criar conta</h2>
-            <form className="space-y-4">
-              <input
-                type="email"
-                placeholder="Email"
-                className="w-full border border-gray-300 px-3 py-2 rounded text-sm"
-              />
-              <input
-                type="password"
-                placeholder="Senha"
-                className="w-full border border-gray-300 px-3 py-2 rounded text-sm"
-              />
-              <button
-                type="submit"
-                className="w-full bg-[var(--color-accent)] text-foreground py-2 rounded text-sm font-bold"
-              >
-                Registrar
-              </button>
-            </form>
-            <p className="mt-8 text-sm text-center">
-              <button
-                onClick={() => setIsRegistering(false)}
-                className="underline text-gray-700"
-              >
-                entrar
-              </button>
-            </p>
-          </>
+        {isLoading ? (
+          <Spinner />
+        ) : user ? (
+          <button
+            className="text-sm"
+            onClick={() => setModalContent("settings")}
+          >
+            {user.username}
+          </button>
         ) : (
-          <>
-            <h2 className="text-xl font-bold mb-4">Entrar</h2>
-            <form className="space-y-4">
-              <input
-                type="email"
-                placeholder="Email"
-                className="w-full border border-gray-300 px-3 py-2 rounded text-sm"
-              />
-              <input
-                type="password"
-                placeholder="Senha"
-                className="w-full border border-gray-300 px-3 py-2 rounded text-sm"
-              />
-              <button
-                type="submit"
-                className="w-full bg-[var(--color-accent)] text-foreground py-2 rounded text-sm font-bold"
-              >
-                entrar
-              </button>
-            </form>
-            <p className="mt-8 text-sm text-center">
-              <button
-                onClick={() => setIsRegistering(true)}
-                className="underline text-gray-700"
-              >
-                criar conta
-              </button>
-            </p>
-          </>
+          <button
+            onClick={() => setModalContent("login")}
+            className="text-sm hover:underline"
+          >
+            login
+          </button>
         )}
-      </Modal>
+      </div>
+      {modal}
     </header>
   );
 }

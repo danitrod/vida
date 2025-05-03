@@ -4,6 +4,7 @@ import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import { cookies } from "next/headers";
 import { Theme } from "@/components/ThemeToggle";
+import { UserProvider } from "@/context/UserContext";
 
 export const metadata: Metadata = {
   title: "vida",
@@ -21,7 +22,9 @@ export default async function RootLayout({
     <html lang="pt-BR" className={theme === "dark" ? "dark" : ""}>
       <body className="px-4 sm:px-8 md:px-16 lg:px-32">
         <div className="max-w-4xl mx-auto py-4">
-          <Header initialTheme={theme} />
+          <UserProvider>
+            <Header initialTheme={theme} />
+          </UserProvider>
           {children}
           <Footer />
         </div>
