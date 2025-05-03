@@ -62,7 +62,7 @@ export default async function PostPage(props: {
         >
           <ReactMarkdown
             components={{
-              a: ({ node, children, ...props }) => (
+              a: ({ children, ...props }) => (
                 <a
                   {...props}
                   target="_blank"

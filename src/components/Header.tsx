@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Modal from "./Modal";
 import Link from "next/link";
 import ThemeToggle, { Theme } from "./ThemeToggle";

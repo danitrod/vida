@@ -40,8 +40,12 @@ export const RegistrationForm = ({ onSwitch, onClose }: FormProps) => {
 
       refreshUser();
       onClose();
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Erro desconhecido.");
+      }
     }
   };
 
