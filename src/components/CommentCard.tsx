@@ -110,7 +110,7 @@ export default function CommentCard({
               </button>
               <button
                 onClick={() => setConfirmingDelete(true)}
-                className="text-red-500 hover:underline"
+                className="text-red-400 hover:underline dark:text-red-900"
               >
                 <FiTrash2 />
               </button>

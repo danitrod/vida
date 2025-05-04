@@ -3,22 +3,15 @@ import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import mongo from "@/lib/mongodb";
 import { validateUsername } from "@/lib/validation";
+import { validateAuth } from "@/lib/auth";
 
 export async function PATCH(req: Request) {
-  const token = (await cookies()).get("auth_token")?.value;
-  if (!token) {
+  const user = await validateAuth();
+  if (!user) {
     return NextResponse.json({ message: "Não autenticado." }, { status: 401 });
   }
 
-  let decoded: any;
-  try {
-    decoded = jwt.verify(token, process.env.JWT_SECRET!);
-  } catch {
-    return NextResponse.json({ message: "Token inválido." }, { status: 401 });
-  }
-
-  const { user } = decoded;
-  const currentEmail = user?.email;
+  const currentEmail = user.email;
   const currentUsername = user?.username;
 
   if (!currentEmail || !currentUsername) {
@@ -41,7 +34,7 @@ export async function PATCH(req: Request) {
 
     const taken = await users.findOne({
       username,
-      email: { $ne: currentEmail }, // Ensure it's not the current user's own doc
+      email: { $ne: currentEmail },
     });
 
     if (taken) {
@@ -52,6 +45,14 @@ export async function PATCH(req: Request) {
     }
 
     await users.updateOne({ email: currentEmail }, { $set: { username } });
+
+    await db
+      .collection("comments")
+      .updateMany({ author: currentUsername }, { $set: { author: username } });
+
+    await db
+      .collection("reactions")
+      .updateMany({ user: currentUsername }, { $set: { user: username } });
 
     const newToken = jwt.sign(
       { user: { email: currentEmail, username } },

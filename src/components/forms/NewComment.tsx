@@ -66,9 +66,9 @@ export default function NewCommentForm({ postSlug, onCommentAdded }: Props) {
       <button
         type="submit"
         disabled={submitting}
-        className="btn disabled:opacity-50"
+        className="btn p-4 disabled:opacity-50"
       >
-        {submitting ? "Enviando..." : "Enviar comentário"}
+        {submitting ? "enviando..." : "enviar comentário"}
       </button>
     </form>
   );

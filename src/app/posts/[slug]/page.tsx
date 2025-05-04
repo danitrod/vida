@@ -8,6 +8,8 @@ import { FaExternalLinkAlt } from "react-icons/fa";
 import Comments from "@/components/Comments";
 import HeartButton from "@/components/HeartButton";
 import { UserProvider } from "@/context/UserContext";
+import mongo from "@/lib/mongodb";
+import { validateAuth, validateAnonToken } from "@/lib/auth";
 
 const postsDir = path.join(process.cwd(), "src/content/posts");
 
@@ -26,7 +28,7 @@ export async function generateMetadata(props: {
   const fileContent = fs.readFileSync(filePath, "utf8");
   const { data } = matter(fileContent);
   return {
-    title: data.title,
+    title: "vida | " + data.title,
     description: data.excerpt,
   };
 }
@@ -39,6 +41,28 @@ export default async function PostPage(props: {
   const fileContent = fs.readFileSync(filePath, "utf8");
 
   const { data, content } = matter(fileContent);
+
+  await mongo.connect();
+  const db = mongo.db();
+
+  const user = await validateAuth();
+  let anonToken: string | null;
+  if (!user) {
+    anonToken = await validateAnonToken();
+  }
+
+  const reactions = await db
+    .collection("reactions")
+    .find({ post: params.slug, type: "love" })
+    .toArray();
+
+  const lovedByUser = reactions.some(
+    (r) =>
+      (r.user && r.user === user?.username) ||
+      (r.anonToken && r.anonToken === anonToken)
+  );
+
+  const heartCount = reactions.length;
 
   return (
     <main className="min-h-screen px-4 py-8 sm:px-8 md:px-16 lg:px-32 bg-[var(--background)] text-[var(--foreground)]">
@@ -83,8 +107,14 @@ export default async function PostPage(props: {
             {content}
           </ReactMarkdown>
         </div>
-        <div className="mt-4">
-          <HeartButton initialCount={4} initiallyLiked={true} />
+        <div className="mt-4 flex justify-center">
+          <UserProvider>
+            <HeartButton
+              initialCount={heartCount}
+              initiallyLoved={lovedByUser}
+              postSlug={params.slug}
+            />
+          </UserProvider>
         </div>
 
         <UserProvider>
