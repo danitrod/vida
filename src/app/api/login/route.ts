@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import jwt from "jsonwebtoken";
 import mongo from "@/lib/mongodb";
 import bcrypt from "bcryptjs";
+import { authorize } from "@/lib/auth";
 
 export async function POST(req: Request) {
   try {
@@ -38,19 +39,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const token = jwt.sign(
-      { user: { username: user.username, email: user.email } },
-      process.env.JWT_SECRET!,
-      { expiresIn: "60d" }
-    );
-
-    (await cookies()).set("auth_token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      path: "/",
-    });
-
+    await authorize({ username: user.username, email: user.email });
     return NextResponse.json({ success: true });
   } catch (err) {
     console.error(err);

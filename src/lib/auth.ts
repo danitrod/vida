@@ -2,12 +2,24 @@ import { cookies } from "next/headers";
 import jwt from "jsonwebtoken";
 import { v4 as uuidv4 } from "uuid";
 import { anonCookie } from "./cookies";
+import { User } from "@/types/user";
 
-const thirtyDaysSeconds = 60 * 60 * 24 * 30;
+const ninetyDaysSeconds = 60 * 60 * 24 * 90;
 
-type User = {
-  username: string;
-  email: string;
+export const authorize = async (user: User) => {
+  const token = jwt.sign(
+    { user: { username: user.username, email: user.email } },
+    process.env.JWT_SECRET!,
+    { expiresIn: "90d" }
+  );
+
+  (await cookies()).set("auth_token", token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
+    maxAge: ninetyDaysSeconds,
+  });
 };
 
 export const validateAuth = async (): Promise<User | null> => {
@@ -34,7 +46,7 @@ export const validateAuth = async (): Promise<User | null> => {
 export const createAnonToken = async (): Promise<string> => {
   const uid = uuidv4();
   const token = jwt.sign({ anon: true, uid }, process.env.JWT_SECRET!, {
-    expiresIn: "30d",
+    expiresIn: "90d",
   });
 
   (await cookies()).set(anonCookie, token, {
@@ -42,7 +54,7 @@ export const createAnonToken = async (): Promise<string> => {
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     path: "/",
-    maxAge: thirtyDaysSeconds,
+    maxAge: ninetyDaysSeconds,
   });
 
   return uid;

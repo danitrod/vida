@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import mongo from "@/lib/mongodb";
 import { validateUsername } from "@/lib/validation";
-import { validateAuth } from "@/lib/auth";
+import { authorize, validateAuth } from "@/lib/auth";
 
 export async function PATCH(req: Request) {
   const user = await validateAuth();
@@ -63,21 +63,7 @@ export async function PATCH(req: Request) {
         { $set: { user: username, updatedAt: new Date() } }
       );
 
-    const newToken = jwt.sign(
-      { user: { email: currentEmail, username } },
-      process.env.JWT_SECRET!,
-      {
-        expiresIn: "60d",
-      }
-    );
-
-    (await cookies()).set("auth_token", newToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      path: "/",
-    });
-
+    await authorize({ username, email: currentEmail });
     return NextResponse.json({
       message: "Nome de usuário atualizado com sucesso.",
     });

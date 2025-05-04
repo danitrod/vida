@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 import mongo from "@/lib/mongodb";
 import bcrypt from "bcryptjs";
 import { validateRegistration } from "@/lib/validation";
+import { authorize } from "@/lib/auth";
 
 export async function POST(req: Request) {
   try {
@@ -47,21 +48,7 @@ export async function POST(req: Request) {
       createdAt: new Date(),
     });
 
-    const token = jwt.sign(
-      { user: { username, email } },
-      process.env.JWT_SECRET!,
-      {
-        expiresIn: "60d",
-      }
-    );
-
-    (await cookies()).set("auth_token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      path: "/",
-    });
-
+    await authorize({ username, email });
     return NextResponse.json({ success: true });
   } catch (err) {
     console.error(err);
