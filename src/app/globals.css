@@ -57,6 +57,20 @@
   .animate-fadeIn {
     animation: fadeIn 0.15s ease-out forwards;
   }
+
+  @keyframes beat {
+    0%,
+    100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.25);
+    }
+  }
+
+  .animate-beat {
+    animation: beat 0.3s ease-in-out;
+  }
 }
 
 @layer base {

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Metadata } from "next";
 import { getAllPosts } from "@/lib/posts";
+import { formatDate } from "@/lib/date";
 
 export const metadata: Metadata = {
   title: "vida — por danitrod",
@@ -23,14 +24,21 @@ export default async function Home() {
 
         <ul className="space-y-8">
           {posts.map((post) => (
-            <li key={post.slug}>
-              <Link
-                href={`/posts/${post.slug}`}
-                className="text-xl font-medium underline underline-offset-4"
-              >
-                {post.title}
+            <li
+              key={post.slug}
+              className="transition duration-200 rounded-md hover:bg-[var(--color-light)] hover:shadow-sm px-4 py-3"
+            >
+              <Link href={`/posts/${post.slug}`} className="block">
+                <h3 className="text-lg font-semibold group-hover:underline underline-offset-4">
+                  {post.title}
+                </h3>
+                <p className="text-sm text-[var(--color-muted)] mt-1">
+                  {post.excerpt}
+                </p>
+                <p className="text-xs text-[var(--color-muted)] mt-2 italic">
+                  {formatDate(post.date)}
+                </p>
               </Link>
-              <p className="text-sm mt-1">{post.excerpt}</p>
             </li>
           ))}
         </ul>

@@ -5,6 +5,9 @@ import { Metadata } from "next";
 import { formatDate } from "@/lib/date";
 import ReactMarkdown from "react-markdown";
 import { FaExternalLinkAlt } from "react-icons/fa";
+import Comments from "@/components/Comments";
+import HeartButton from "@/components/HeartButton";
+import { UserProvider } from "@/context/UserContext";
 
 const postsDir = path.join(process.cwd(), "src/content/posts");
 
@@ -50,7 +53,6 @@ export default async function PostPage(props: {
           className="prose prose-lg dark:prose-invert prose-neutral"
           style={
             {
-              // Optional: override with custom colors
               "--tw-prose-body": "var(--foreground)",
               "--tw-prose-headings": "var(--color-carrot)",
               "--tw-prose-links": "var(--color-orange)",
@@ -81,6 +83,13 @@ export default async function PostPage(props: {
             {content}
           </ReactMarkdown>
         </div>
+        <div className="mt-4">
+          <HeartButton initialCount={4} initiallyLiked={true} />
+        </div>
+
+        <UserProvider>
+          <Comments slug={params.slug} />
+        </UserProvider>
       </article>
     </main>
   );
