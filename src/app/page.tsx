@@ -4,9 +4,8 @@ import { getAllPosts } from "@/lib/posts";
 import { formatDate } from "@/lib/date";
 
 export const metadata: Metadata = {
-  title: "vida — por danitrod",
-  description:
-    "Reflexões pessoais, experimentos de estilo de vida e pensamentos de baixa tecnologia.",
+  title: "vida | by danitrod",
+  description: "Pensamentos e histórias tirados de um bloco de notas.",
 };
 
 export default async function Home() {
