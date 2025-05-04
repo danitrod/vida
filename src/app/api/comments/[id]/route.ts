@@ -86,7 +86,10 @@ export async function PATCH(
       return NextResponse.json({ message: "Sem permissão" }, { status: 403 });
     }
 
-    await comments.updateOne({ _id: new ObjectId(id) }, { $set: { content } });
+    await comments.updateOne(
+      { _id: new ObjectId(id) },
+      { $set: { content, updatedAt: new Date() } }
+    );
 
     return NextResponse.json({ success: true });
   } catch (err) {

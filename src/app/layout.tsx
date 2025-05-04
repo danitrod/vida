@@ -51,6 +51,7 @@ export default async function RootLayout({
         {
           $inc: incFields,
           $setOnInsert: { createdAt: new Date() },
+          $set: { updatedAt: new Date() },
         },
         { upsert: true }
       );

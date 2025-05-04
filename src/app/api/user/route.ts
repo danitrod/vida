@@ -44,15 +44,24 @@ export async function PATCH(req: Request) {
       );
     }
 
-    await users.updateOne({ email: currentEmail }, { $set: { username } });
+    await users.updateOne(
+      { email: currentEmail },
+      { $set: { username, updatedAt: new Date() } }
+    );
 
     await db
       .collection("comments")
-      .updateMany({ author: currentUsername }, { $set: { author: username } });
+      .updateMany(
+        { author: currentUsername },
+        { $set: { author: username, updatedAt: new Date() } }
+      );
 
     await db
       .collection("reactions")
-      .updateMany({ user: currentUsername }, { $set: { user: username } });
+      .updateMany(
+        { user: currentUsername },
+        { $set: { user: username, updatedAt: new Date() } }
+      );
 
     const newToken = jwt.sign(
       { user: { email: currentEmail, username } },
