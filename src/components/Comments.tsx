@@ -1,7 +1,7 @@
 "use client";
 
 import { useUser } from "@/context/UserContext";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import NewCommentForm from "./forms/NewComment";
 import CommentCard from "./CommentCard";
 import { Comment } from "@/types/comment";
@@ -14,11 +14,11 @@ export default function Comments({ slug }: CommentsProps) {
   const { user } = useUser();
   const [comments, setComments] = useState<Comment[]>([]);
 
-  const fetchComments = async () => {
+  const fetchComments = useCallback(async () => {
     const res = await fetch(`/api/comments?slug=${slug}`);
     const data = await res.json();
     setComments(data.comments);
-  };
+  }, [slug]);
 
   useEffect(() => {
     fetchComments();
