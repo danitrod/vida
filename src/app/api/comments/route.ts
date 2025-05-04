@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import mongo from "@/lib/mongodb";
-import { validateAuth } from "@/lib/auth";
+import { createAnonToken, validateAnonToken, validateAuth } from "@/lib/auth";
+import { v4 as uuidv4 } from "uuid";
+import { cookies } from "next/headers";
+import jwt from "jsonwebtoken";
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
@@ -39,8 +42,14 @@ export async function POST(req: Request) {
 
     const user = await validateAuth();
     let author = authorName;
+    let anonToken;
     if (user) {
       author = user.username;
+    } else {
+      anonToken = await validateAnonToken();
+      if (!anonToken) {
+        anonToken = await createAnonToken();
+      }
     }
 
     await mongo.connect();
@@ -51,6 +60,7 @@ export async function POST(req: Request) {
       slug,
       content,
       author,
+      anonToken,
       createdAt: new Date(),
     });
 

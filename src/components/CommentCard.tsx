@@ -1,8 +1,10 @@
 import { formatDate } from "@/lib/date";
 import { Comment } from "@/types/comment";
 import { User } from "@/types/user";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FiTrash2, FiEdit } from "react-icons/fi";
+import Cookies from "js-cookie";
+import { anonCookie } from "@/lib/cookies";
 
 type Props = {
   comment: Comment;
@@ -17,11 +19,25 @@ export default function CommentCard({
   handleDelete,
   handleEdit,
 }: Props) {
+  const [anonToken, setAnonToken] = useState<string | null>(null);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const [editing, setEditing] = useState(false);
   const [editContent, setEditContent] = useState(comment.content);
 
-  const isOwner = user?.username === comment.author;
+  useEffect(() => {
+    const token = Cookies.get(anonCookie);
+    if (!token) return;
+
+    try {
+      const decoded = JSON.parse(atob(token.split(".")[1]));
+      if (decoded?.uid) setAnonToken(decoded.uid);
+    } catch (err) {
+      console.error("Invalid anon token", err);
+    }
+  }, []);
+
+  const isOwner =
+    user?.username === comment.author || comment.anonToken === anonToken;
 
   return (
     <li

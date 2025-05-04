@@ -1,7 +1,7 @@
 import { ObjectId } from "mongodb";
 import { NextResponse } from "next/server";
 import mongo from "@/lib/mongodb";
-import { validateAuth } from "@/lib/auth";
+import { validateAnonToken, validateAuth } from "@/lib/auth";
 
 export async function DELETE(
   req: Request,
@@ -9,9 +9,16 @@ export async function DELETE(
 ) {
   try {
     const user = await validateAuth();
+    let anonToken;
 
     if (!user) {
-      return NextResponse.json({ message: "Não autenticado" }, { status: 401 });
+      anonToken = await validateAnonToken();
+      if (!anonToken) {
+        return NextResponse.json(
+          { message: "Não autenticado" },
+          { status: 401 }
+        );
+      }
     }
 
     await mongo.connect();
@@ -25,7 +32,10 @@ export async function DELETE(
         { status: 404 }
       );
 
-    if (comment.author !== user.username) {
+    if (
+      (user && comment.author !== user.username) ||
+      (!user && comment.anonToken !== anonToken)
+    ) {
       return NextResponse.json({ message: "Sem permissão" }, { status: 403 });
     }
 
@@ -44,8 +54,15 @@ export async function PATCH(
 ) {
   try {
     const user = await validateAuth();
+    let anonToken;
     if (!user) {
-      return NextResponse.json({ message: "Não autenticado" }, { status: 401 });
+      anonToken = await validateAnonToken();
+      if (!anonToken) {
+        return NextResponse.json(
+          { message: "Não autenticado" },
+          { status: 401 }
+        );
+      }
     }
 
     const { content } = await req.json();
@@ -54,17 +71,23 @@ export async function PATCH(
     const db = mongo.db();
     const comments = db.collection("comments");
 
-    const result = await comments.updateOne(
-      { _id: new ObjectId(params.id), author: user.username },
-      { $set: { content } }
-    );
-
-    if (result.modifiedCount === 0) {
+    const comment = await comments.findOne({ _id: new ObjectId(params.id) });
+    if (!comment)
       return NextResponse.json(
-        { message: "Comentário não encontrado ou sem permissão" },
+        { message: "Comentário não encontrado" },
         { status: 404 }
       );
+    if (
+      (user && comment.author !== user.username) ||
+      (!user && comment.anonToken !== anonToken)
+    ) {
+      return NextResponse.json({ message: "Sem permissão" }, { status: 403 });
     }
+
+    await comments.updateOne(
+      { _id: new ObjectId(params.id) },
+      { $set: { content } }
+    );
 
     return NextResponse.json({ success: true });
   } catch (err) {
