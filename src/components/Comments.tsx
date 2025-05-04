@@ -30,6 +30,25 @@ export default function Comments({ slug }: CommentsProps) {
     setComments(newComments);
   };
 
+  const handleEdit = async (id: string, newContent: string) => {
+    try {
+      fetch(`/api/comments/${id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ content: newContent }),
+      });
+
+      const updatedComments = comments.map((comment) =>
+        comment._id === id ? { ...comment, content: newContent } : comment
+      );
+      setComments(updatedComments);
+    } catch (err) {
+      console.error("Erro ao editar comentário:", err);
+    }
+  };
+
   return (
     <section className="mt-16 max-w-3xl mx-auto">
       <h2 className="text-xl font-semibold mb-4">comentários</h2>
@@ -39,9 +58,11 @@ export default function Comments({ slug }: CommentsProps) {
         <ul className="space-y-6">
           {comments.map((comment) => (
             <CommentCard
+              key={comment._id}
               comment={comment}
               user={user}
               handleDelete={handleDelete}
+              handleEdit={handleEdit}
             />
           ))}
         </ul>

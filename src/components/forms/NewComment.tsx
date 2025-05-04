@@ -15,8 +15,6 @@ export default function NewCommentForm({ postSlug, onCommentAdded }: Props) {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
-  console.log("us", user);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!text.trim()) return;

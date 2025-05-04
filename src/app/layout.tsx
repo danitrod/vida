@@ -20,6 +20,9 @@ export default async function RootLayout({
 
   return (
     <html lang="pt-BR" className={theme === "dark" ? "dark" : ""}>
+      <head>
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+      </head>
       <body className="px-4 sm:px-8 md:px-16 lg:px-32">
         <div className="max-w-4xl mx-auto py-4">
           <UserProvider>
