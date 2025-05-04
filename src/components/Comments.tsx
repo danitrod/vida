@@ -22,7 +22,7 @@ export default function Comments({ slug }: CommentsProps) {
 
   useEffect(() => {
     fetchComments();
-  }, [slug]);
+  }, [slug, fetchComments]);
 
   const handleDelete = async (id: string) => {
     fetch(`/api/comments/${id}`, { method: "DELETE" });

@@ -1,13 +1,14 @@
 import { ObjectId } from "mongodb";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import mongo from "@/lib/mongodb";
 import { validateAnonToken, validateAuth } from "@/lib/auth";
 
 export async function DELETE(
-  req: Request,
-  { params }: { params: { id: string } }
+  _: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const id = (await params).id;
     const user = await validateAuth();
     let anonToken;
 
@@ -25,7 +26,7 @@ export async function DELETE(
     const db = mongo.db();
     const comments = db.collection("comments");
 
-    const comment = await comments.findOne({ _id: new ObjectId(params.id) });
+    const comment = await comments.findOne({ _id: new ObjectId(id) });
     if (!comment)
       return NextResponse.json(
         { message: "Comentário não encontrado" },
@@ -39,7 +40,7 @@ export async function DELETE(
       return NextResponse.json({ message: "Sem permissão" }, { status: 403 });
     }
 
-    await comments.deleteOne({ _id: new ObjectId(params.id) });
+    await comments.deleteOne({ _id: new ObjectId(id) });
 
     return NextResponse.json({ success: true });
   } catch (err) {
@@ -50,9 +51,10 @@ export async function DELETE(
 
 export async function PATCH(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const id = (await params).id;
     const user = await validateAuth();
     let anonToken;
     if (!user) {
@@ -71,7 +73,7 @@ export async function PATCH(
     const db = mongo.db();
     const comments = db.collection("comments");
 
-    const comment = await comments.findOne({ _id: new ObjectId(params.id) });
+    const comment = await comments.findOne({ _id: new ObjectId(id) });
     if (!comment)
       return NextResponse.json(
         { message: "Comentário não encontrado" },
@@ -84,10 +86,7 @@ export async function PATCH(
       return NextResponse.json({ message: "Sem permissão" }, { status: 403 });
     }
 
-    await comments.updateOne(
-      { _id: new ObjectId(params.id) },
-      { $set: { content } }
-    );
+    await comments.updateOne({ _id: new ObjectId(id) }, { $set: { content } });
 
     return NextResponse.json({ success: true });
   } catch (err) {

@@ -1,9 +1,7 @@
 import { NextResponse } from "next/server";
 import mongo from "@/lib/mongodb";
 import { createAnonToken, validateAnonToken, validateAuth } from "@/lib/auth";
-import { v4 as uuidv4 } from "uuid";
-import { cookies } from "next/headers";
-import jwt from "jsonwebtoken";
+import { ObjectId } from "mongodb";
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
@@ -21,7 +19,7 @@ export async function GET(req: Request) {
     .sort({ createdAt: -1 })
     .toArray();
 
-  const sanitized = comments.map(({ _id, ...rest }: { _id: any }) => ({
+  const sanitized = comments.map(({ _id, ...rest }: { _id: ObjectId }) => ({
     _id: _id.toString(),
     ...rest,
   }));

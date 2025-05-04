@@ -19,8 +19,8 @@ export const validateAuth = async (): Promise<User | null> => {
 
     if (typeof decoded === "object" && decoded !== null && "user" in decoded) {
       return {
-        username: (decoded as any).user.username,
-        email: (decoded as any).user.email,
+        username: (decoded as { user: User }).user.username,
+        email: (decoded as { user: User }).user.email,
       };
     }
   } catch (err) {
@@ -53,7 +53,10 @@ export const validateAnonToken = async (): Promise<string | null> => {
   if (!token) return null;
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as {
+      anon: boolean;
+      uid: string;
+    };
     if (decoded.anon && decoded.uid) {
       return decoded.uid;
     }

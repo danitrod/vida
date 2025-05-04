@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 
 type Props = {
