@@ -1,6 +1,4 @@
-import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
 import mongo from "@/lib/mongodb";
 import { validateUsername } from "@/lib/validation";
 import { authorize, validateAuth } from "@/lib/auth";

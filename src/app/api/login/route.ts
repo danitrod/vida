@@ -1,6 +1,4 @@
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
-import jwt from "jsonwebtoken";
 import mongo from "@/lib/mongodb";
 import bcrypt from "bcryptjs";
 import { authorize } from "@/lib/auth";
