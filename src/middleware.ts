@@ -5,11 +5,8 @@ export const config = {
 };
 
 export async function middleware(req: NextRequest) {
-  console.log("running middleward");
-
   const path = req.nextUrl.pathname;
   if (path.startsWith("/_next")) {
-    console.log("skipping _next");
     return NextResponse.next();
   }
 

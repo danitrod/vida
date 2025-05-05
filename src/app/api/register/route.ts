@@ -6,7 +6,7 @@ import { authorize } from "@/lib/auth";
 
 export async function POST(req: Request) {
   try {
-    const { username, email, password } = await req.json();
+    const { username, email, password, subscribeToPosts } = await req.json();
 
     const error = validateRegistration({
       username,
@@ -43,6 +43,7 @@ export async function POST(req: Request) {
       username,
       email,
       password: hashedPassword,
+      subscribeToPosts,
       createdAt: new Date(),
     });
 

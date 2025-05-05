@@ -19,7 +19,7 @@ export async function PATCH(req: Request) {
     );
   }
 
-  const { username } = await req.json();
+  const { username, subscribeToPosts } = await req.json();
   const validationError = validateUsername(username);
   if (validationError) {
     return NextResponse.json({ message: validationError }, { status: 400 });
@@ -44,22 +44,24 @@ export async function PATCH(req: Request) {
 
     await users.updateOne(
       { email: currentEmail },
-      { $set: { username, updatedAt: new Date() } }
+      { $set: { username, subscribeToPosts, updatedAt: new Date() } }
     );
 
-    await db
-      .collection("comments")
-      .updateMany(
-        { author: currentUsername },
-        { $set: { author: username, updatedAt: new Date() } }
-      );
+    if (currentUsername !== username) {
+      await db
+        .collection("comments")
+        .updateMany(
+          { author: currentUsername },
+          { $set: { author: username, updatedAt: new Date() } }
+        );
 
-    await db
-      .collection("reactions")
-      .updateMany(
-        { user: currentUsername },
-        { $set: { user: username, updatedAt: new Date() } }
-      );
+      await db
+        .collection("reactions")
+        .updateMany(
+          { user: currentUsername },
+          { $set: { user: username, updatedAt: new Date() } }
+        );
+    }
 
     await authorize({ username, email: currentEmail });
     return NextResponse.json({

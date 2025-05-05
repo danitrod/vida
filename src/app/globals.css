@@ -40,6 +40,10 @@
   .btn-secondary {
     @apply bg-[var(--color-soft)] text-foreground py-2 rounded text-sm font-bold;
   }
+
+  .btn-danger {
+    @apply bg-red-500 text-background py-2 rounded text-sm font-bold transition-colors duration-200 ease-in-out hover:bg-red-600 active:bg-red-700 dark:text-foreground;
+  }
 }
 
 @layer utilities {

@@ -9,6 +9,7 @@ export const RegistrationForm = ({ onSwitch, onClose }: FormProps) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [subscribeToPosts, setSubscribeToPosts] = useState(true);
   const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -30,7 +31,7 @@ export const RegistrationForm = ({ onSwitch, onClose }: FormProps) => {
       const res = await fetch("/api/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, email, password }),
+        body: JSON.stringify({ username, email, password, subscribeToPosts }),
       });
 
       if (!res.ok) {
@@ -97,11 +98,24 @@ export const RegistrationForm = ({ onSwitch, onClose }: FormProps) => {
           placeholder="Confirme sua senha..."
           className="w-full border border-gray-300 px-3 py-2 rounded text-sm"
         />
+
+        <label className="flex items-center gap-2 text-sm">
+          <input
+            type="checkbox"
+            checked={subscribeToPosts}
+            onChange={(e) => setSubscribeToPosts(e.target.checked)}
+            className="w-4 h-4"
+          />
+          me avise por email quando houver novos posts
+        </label>
+
         {error && <p className="text-red-500 text-sm">{error}</p>}
+
         <button type="submit" className="btn w-full mt-4">
           registrar
         </button>
       </form>
+
       <p className="mt-8 text-sm text-center">
         <button onClick={onSwitch} className="underline text-gray-700">
           já tem conta?
