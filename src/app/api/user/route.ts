@@ -31,7 +31,7 @@ export async function PATCH(req: Request) {
     const users = db.collection("users");
 
     const taken = await users.findOne({
-      username,
+      username: { $regex: `^${username}$`, $options: "i" },
       email: { $ne: currentEmail },
     });
 

@@ -22,7 +22,9 @@ export async function POST(req: Request) {
     const db = mongo.db();
     const users = db.collection("users");
 
-    const existingUser = await users.findOne({ username });
+    const existingUser = await users.findOne({
+      username: { $regex: `^${username}$`, $options: "i" },
+    });
     if (existingUser) {
       return NextResponse.json(
         { message: "Usuário já cadastrado." },
@@ -30,7 +32,9 @@ export async function POST(req: Request) {
       );
     }
 
-    const existingEmail = await users.findOne({ email });
+    const existingEmail = await users.findOne({
+      email: { $regex: `^${email}$`, $options: "i" },
+    });
     if (existingEmail) {
       return NextResponse.json(
         { message: "Email já cadastrado." },

@@ -19,7 +19,10 @@ export async function POST(req: Request) {
     const users = db.collection("users");
 
     const user = await users.findOne({
-      $or: [{ email: usernameOrEmail }, { username: usernameOrEmail }],
+      $or: [
+        { email: { $regex: `^${usernameOrEmail}$`, $options: "i" } },
+        { username: { $regex: `^${usernameOrEmail}$`, $options: "i" } },
+      ],
     });
 
     if (!user) {
