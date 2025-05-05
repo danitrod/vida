@@ -2,6 +2,7 @@ import { useState } from "react";
 import { FormProps } from "./props";
 import { validateRegistration } from "@/lib/validation";
 import { useUser } from "@/context/UserContext";
+import Spinner from "@/components/Spinner";
 
 export const RegistrationForm = ({ onSwitch, onClose }: FormProps) => {
   const { refreshUser } = useUser();
@@ -10,6 +11,7 @@ export const RegistrationForm = ({ onSwitch, onClose }: FormProps) => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [subscribeToPosts, setSubscribeToPosts] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -27,6 +29,7 @@ export const RegistrationForm = ({ onSwitch, onClose }: FormProps) => {
       return;
     }
 
+    setLoading(true);
     try {
       const res = await fetch("/api/register", {
         method: "POST",
@@ -47,6 +50,8 @@ export const RegistrationForm = ({ onSwitch, onClose }: FormProps) => {
       } else {
         setError("Erro desconhecido.");
       }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -111,9 +116,13 @@ export const RegistrationForm = ({ onSwitch, onClose }: FormProps) => {
 
         {error && <p className="text-red-500 text-sm">{error}</p>}
 
-        <button type="submit" className="btn w-full mt-4">
-          registrar
-        </button>
+        {loading ? (
+          <Spinner className="mt-2" />
+        ) : (
+          <button type="submit" className="btn w-full mt-4">
+            registrar
+          </button>
+        )}
       </form>
 
       <p className="mt-8 text-sm text-center">

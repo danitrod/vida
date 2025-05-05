@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { useUser } from "@/context/UserContext";
 import { FormProps } from "./props";
+import Spinner from "@/components/Spinner";
 
 export function LoginForm({ onSwitch, onClose }: FormProps) {
   const [usernameOrEmail, setUsernameOrEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const { refreshUser } = useUser();
 
@@ -17,6 +19,7 @@ export function LoginForm({ onSwitch, onClose }: FormProps) {
       return;
     }
 
+    setLoading(true);
     try {
       const res = await fetch("/api/login", {
         method: "POST",
@@ -37,6 +40,8 @@ export function LoginForm({ onSwitch, onClose }: FormProps) {
       } else {
         setError("Erro desconhecido.");
       }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -67,9 +72,13 @@ export function LoginForm({ onSwitch, onClose }: FormProps) {
           onChange={(e) => setPassword(e.target.value)}
         />
         {error && <p className="text-sm text-red-500">{error}</p>}
-        <button type="submit" className="btn w-full">
-          entrar
-        </button>
+        {loading ? (
+          <Spinner className="mt-2" />
+        ) : (
+          <button type="submit" className="btn w-full">
+            entrar
+          </button>
+        )}
       </form>
       <p className="mt-8 text-sm text-center">
         <button onClick={onSwitch} className="underline text-gray-700">

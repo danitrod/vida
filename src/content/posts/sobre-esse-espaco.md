@@ -21,11 +21,10 @@ Bom, a ideia deste espaço é eu compartilhar um pouco não só dessas notas, ma
 e experiências em geral, sejam eles relacionados ou não a trabalho. Mas de um ponto de vista não
 técnico, e sim mais filosófico, psicológico, ou até cômico. Quem sabe possa abrir aqui também um
 diálogo com quem tiver interesse. Estou deixando uma seção de comentários em cada post para isso.
-Será possível comentar tanto anonimamente quanto registrando uma conta.
 
 Os anos se passam, a vida vai passando, e muito vai sendo esquecido. Acho que a gente precisa fazer
 um esforço para o que é importante ser lembrado. E não que minhas experiências pessoais sejam lá tão
-importantes, mas tenho certeza de que elas têm seu valor. E se eu puder contribuir um pouco das
+importantes, mas tenho a certeza de que elas têm seu valor. E se eu puder contribuir um pouco das
 minhas experiências como legado pra algo maior, será meu prazer. Acho que o meu gosto por escrever
 tem muito a ver com esse desejo de contribuir para esse "algo maior". Apesar de ainda não saber
 descrever muito bem o que ele é.
