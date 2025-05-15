@@ -4,13 +4,14 @@ import { v4 as uuidv4 } from "uuid";
 import { anonCookie } from "./cookies";
 import { User } from "@/types/user";
 
+const semesterSeconds = 60 * 60 * 24 * 180;
 const ninetyDaysSeconds = 60 * 60 * 24 * 90;
 
 export const authorize = async (user: User) => {
   const token = jwt.sign(
     { user: { username: user.username, email: user.email } },
     process.env.JWT_SECRET!,
-    { expiresIn: "90d" }
+    { expiresIn: "180d" }
   );
 
   (await cookies()).set("auth_token", token, {
@@ -18,7 +19,7 @@ export const authorize = async (user: User) => {
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     path: "/",
-    maxAge: ninetyDaysSeconds,
+    maxAge: semesterSeconds,
   });
 };
 
