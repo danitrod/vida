@@ -74,7 +74,7 @@ export default function Header({ initialTheme }: HeaderProps) {
           </button>
         ) : (
           <button
-            onClick={() => setModalContent("login")}
+            onClick={() => setModalContent("register")}
             className="text-sm hover:underline"
           >
             login

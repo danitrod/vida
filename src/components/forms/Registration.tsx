@@ -126,7 +126,10 @@ export const RegistrationForm = ({ onSwitch, onClose }: FormProps) => {
       </form>
 
       <p className="mt-8 text-sm text-center">
-        <button onClick={onSwitch} className="underline text-gray-700">
+        <button
+          onClick={onSwitch}
+          className="underline text-[var(--color-foreground)"
+        >
           já tem conta?
         </button>
       </p>
