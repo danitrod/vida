@@ -1,10 +1,7 @@
 import fs from "fs";
 import path from "path";
-import matter from "gray-matter";
 import { Metadata } from "next";
 import { formatDate } from "@/lib/date";
-import ReactMarkdown from "react-markdown";
-import { FaExternalLinkAlt } from "react-icons/fa";
 import Comments from "@/components/Comments";
 import HeartButton from "@/components/HeartButton";
 import { UserProvider } from "@/context/UserContext";
@@ -16,7 +13,7 @@ const postsDir = path.join(process.cwd(), "src/content/posts");
 export async function generateStaticParams() {
   const files = fs.readdirSync(postsDir);
   return files.map((filename) => ({
-    slug: filename.replace(/\.md$/, ""),
+    slug: filename.replace(/\.mdx$/, ""),
   }));
 }
 
@@ -24,23 +21,20 @@ export async function generateMetadata(props: {
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const params = await props.params;
-  const filePath = path.join(postsDir, `${params.slug}.md`);
-  const fileContent = fs.readFileSync(filePath, "utf8");
-  const { data } = matter(fileContent);
+  const { metadata } = await import(`@/content/posts/${params.slug}.mdx`);
   return {
-    title: "vida | " + data.title,
-    description: data.excerpt,
+    title: "vida | " + metadata.title,
+    description: metadata.excerpt,
   };
 }
 
 export default async function PostPage(props: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ slug: string; date: string }>;
 }) {
   const params = await props.params;
-  const filePath = path.join(postsDir, `${params.slug}.md`);
-  const fileContent = fs.readFileSync(filePath, "utf8");
-
-  const { data, content } = matter(fileContent);
+  const { default: Post, metadata } = await import(
+    `@/content/posts/${params.slug}.mdx`
+  );
 
   await mongo.connect();
   const db = mongo.db();
@@ -68,13 +62,18 @@ export default async function PostPage(props: {
     <main className="min-h-screen px-4 py-8 sm:px-8 md:px-16 lg:px-32 bg-[var(--background)] text-[var(--foreground)]">
       <article className="max-w-3xl mx-auto">
         <h1 className="text-4xl font-extrabold tracking-tight text-[var(--color-carrot)] mb-2">
-          {data.title}
+          {metadata.title}
         </h1>
-        <p className="text-sm text-[var(--color-sand)] mb-8">
-          {formatDate(data.date)}
+        <p className="text-sm text-[var(--color-sand)]">
+          {formatDate(metadata.date)}
         </p>
+        {metadata.notesDate && (
+          <p className="text-xs text-[var(--color-sand)] opacity-70 italic">
+            Com notas de {formatDate(metadata.notesDate)}
+          </p>
+        )}
         <div
-          className="prose prose-lg dark:prose-invert prose-neutral"
+          className="prose prose-lg dark:prose-invert prose-neutral mt-8"
           style={
             {
               "--tw-prose-body": "var(--foreground)",
@@ -86,26 +85,7 @@ export default async function PostPage(props: {
             } as React.CSSProperties
           }
         >
-          <ReactMarkdown
-            components={{
-              a: ({ children, ...props }) => (
-                <a
-                  {...props}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-[var(--color-orange)] underline hover:opacity-80 whitespace-nowrap"
-                >
-                  {children}
-                  <FaExternalLinkAlt
-                    className="inline-block -mt-1 ml-1"
-                    size={8}
-                  />
-                </a>
-              ),
-            }}
-          >
-            {content}
-          </ReactMarkdown>
+          <Post />
         </div>
         <div className="mt-4 flex justify-center">
           <UserProvider>

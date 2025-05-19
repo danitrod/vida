@@ -1,6 +1,5 @@
 import fs from "fs";
 import path from "path";
-import matter from "gray-matter";
 
 const postsDirectory = path.join(process.cwd(), "src/content/posts");
 
@@ -9,23 +8,25 @@ export type PostMeta = {
   title: string;
   excerpt: string;
   date: string;
+  notesDate?: string;
 };
 
 export async function getAllPosts(): Promise<PostMeta[]> {
   const filenames = fs.readdirSync(postsDirectory);
 
-  const posts = filenames.map((filename) => {
-    const filePath = path.join(postsDirectory, filename);
-    const fileContents = fs.readFileSync(filePath, "utf8");
-    const { data } = matter(fileContents);
+  const posts = await Promise.all(
+    filenames.map(async (filename) => {
+      const { metadata } = await import(`@/content/posts/${filename}`);
 
-    return {
-      slug: filename.replace(/\.md$/, ""),
-      title: data.title,
-      excerpt: data.excerpt,
-      date: data.date,
-    };
-  });
+      return {
+        slug: filename.replace(/\.mdx$/, ""),
+        title: metadata.title,
+        excerpt: metadata.excerpt,
+        date: metadata.date,
+        notesDate: metadata.notesDate,
+      };
+    })
+  );
 
   // Sort by date descending
   return posts.sort((a, b) => (a.date > b.date ? -1 : 1));
