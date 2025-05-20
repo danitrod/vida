@@ -7,6 +7,7 @@ import HeartButton from "@/components/HeartButton";
 import { UserProvider } from "@/context/UserContext";
 import mongo from "@/lib/mongodb";
 import { validateAuth, validateAnonToken } from "@/lib/auth";
+import { notFound } from "next/navigation";
 
 const postsDir = path.join(process.cwd(), "src/content/posts");
 
@@ -29,12 +30,20 @@ export async function generateMetadata(props: {
 }
 
 export default async function PostPage(props: {
-  params: Promise<{ slug: string; date: string }>;
+  params: Promise<{ slug: string }>;
 }) {
   const params = await props.params;
-  const { default: Post, metadata } = await import(
-    `@/content/posts/${params.slug}.mdx`
-  );
+  let Post, metadata;
+  try {
+    const { default: postContent, metadata: postMetadata } = await import(
+      `@/content/posts/${params.slug}.mdx`
+    );
+    Post = postContent;
+    metadata = postMetadata;
+  } catch (err) {
+    console.error(err);
+    notFound();
+  }
 
   await mongo.connect();
   const db = mongo.db();
