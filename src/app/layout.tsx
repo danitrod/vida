@@ -5,7 +5,7 @@ import Header from "@/components/Header";
 import { cookies, headers } from "next/headers";
 import { Theme } from "@/components/ThemeToggle";
 import { UserProvider } from "@/context/UserContext";
-import mongo from "@/lib/mongodb";
+import mongo, { mongoSafeKey } from "@/lib/mongodb";
 
 export const metadata: Metadata = {
   title: "vida",
@@ -31,11 +31,11 @@ export default async function RootLayout({
     };
 
     if (utm) {
-      incFields[`utm.${utm}`] = 1;
+      incFields[`utm.${mongoSafeKey(utm)}`] = 1;
     }
 
     if (ref) {
-      incFields[`referrer.${ref}`] = 1;
+      incFields[`referrer.${mongoSafeKey(ref)}`] = 1;
     }
 
     if (fbclid) {

@@ -29,3 +29,8 @@ if (process.env.NODE_ENV === "development") {
 // separate module, the client can be shared across functions.
 
 export default client;
+
+export function mongoSafeKey(key: string): string {
+  // MongoDB keys cannot contain dots or dollar signs
+  return key.replace(/[$.]/g, "_");
+}
