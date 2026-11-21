@@ -29,3 +29,11 @@ if (process.env.NODE_ENV === "development") {
 // separate module, the client can be shared across functions.
 
 export default client;
+
+// Exact, case-insensitive match for a user-supplied string. The value is
+// regex-escaped, so input like ".*" or "(a+)+$" is matched literally instead
+// of being interpreted as a pattern.
+export function equalsIgnoreCase(value: string) {
+  const escaped = value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return { $regex: `^${escaped}$`, $options: "i" };
+}

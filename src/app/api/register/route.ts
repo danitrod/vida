@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import mongo from "@/lib/mongodb";
+import mongo, { equalsIgnoreCase } from "@/lib/mongodb";
 import bcrypt from "bcryptjs";
 import { validateRegistration } from "@/lib/validation";
 import { authorize } from "@/lib/auth";
@@ -7,6 +7,17 @@ import { authorize } from "@/lib/auth";
 export async function POST(req: Request) {
   try {
     const { username, email, password, subscribeToPosts } = await req.json();
+
+    if (
+      typeof username !== "string" ||
+      typeof email !== "string" ||
+      typeof password !== "string"
+    ) {
+      return NextResponse.json(
+        { message: "Preencha todos os campos." },
+        { status: 400 }
+      );
+    }
 
     const error = validateRegistration({
       username,
@@ -23,7 +34,7 @@ export async function POST(req: Request) {
     const users = db.collection("users");
 
     const existingUser = await users.findOne({
-      username: { $regex: `^${username}$`, $options: "i" },
+      username: equalsIgnoreCase(username),
     });
     if (existingUser) {
       return NextResponse.json(
@@ -33,7 +44,7 @@ export async function POST(req: Request) {
     }
 
     const existingEmail = await users.findOne({
-      email: { $regex: `^${email}$`, $options: "i" },
+      email: equalsIgnoreCase(email),
     });
     if (existingEmail) {
       return NextResponse.json(
@@ -47,7 +58,7 @@ export async function POST(req: Request) {
       username,
       email,
       password: hashedPassword,
-      subscribeToPosts,
+      subscribeToPosts: subscribeToPosts === true,
       createdAt: new Date(),
     });
 

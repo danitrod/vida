@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import mongo from "@/lib/mongodb";
+import mongo, { equalsIgnoreCase } from "@/lib/mongodb";
 import { validateUsername } from "@/lib/validation";
 import { authorize, validateAuth } from "@/lib/auth";
 
@@ -20,6 +20,12 @@ export async function PATCH(req: Request) {
   }
 
   const { username, subscribeToPosts } = await req.json();
+  if (typeof username !== "string") {
+    return NextResponse.json(
+      { message: "Nome de usuário é obrigatório." },
+      { status: 400 }
+    );
+  }
   const validationError = validateUsername(username);
   if (validationError) {
     return NextResponse.json({ message: validationError }, { status: 400 });
@@ -31,7 +37,7 @@ export async function PATCH(req: Request) {
     const users = db.collection("users");
 
     const taken = await users.findOne({
-      username: { $regex: `^${username}$`, $options: "i" },
+      username: equalsIgnoreCase(username),
       email: { $ne: currentEmail },
     });
 
@@ -44,7 +50,13 @@ export async function PATCH(req: Request) {
 
     await users.updateOne(
       { email: currentEmail },
-      { $set: { username, subscribeToPosts, updatedAt: new Date() } }
+      {
+        $set: {
+          username,
+          subscribeToPosts: subscribeToPosts === true,
+          updatedAt: new Date(),
+        },
+      }
     );
 
     if (currentUsername !== username) {

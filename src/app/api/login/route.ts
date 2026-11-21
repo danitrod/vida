@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import mongo from "@/lib/mongodb";
+import mongo, { equalsIgnoreCase } from "@/lib/mongodb";
 import bcrypt from "bcryptjs";
 import { authorize } from "@/lib/auth";
 
@@ -7,7 +7,12 @@ export async function POST(req: Request) {
   try {
     const { email: usernameOrEmail, password } = await req.json();
 
-    if (!usernameOrEmail || !password) {
+    if (
+      typeof usernameOrEmail !== "string" ||
+      typeof password !== "string" ||
+      !usernameOrEmail ||
+      !password
+    ) {
       return NextResponse.json(
         { message: "Usuário e senha são obrigatórios." },
         { status: 400 }
@@ -20,8 +25,8 @@ export async function POST(req: Request) {
 
     const user = await users.findOne({
       $or: [
-        { email: { $regex: `^${usernameOrEmail}$`, $options: "i" } },
-        { username: { $regex: `^${usernameOrEmail}$`, $options: "i" } },
+        { email: equalsIgnoreCase(usernameOrEmail) },
+        { username: equalsIgnoreCase(usernameOrEmail) },
       ],
     });
 
