@@ -39,10 +39,10 @@ export function describeDevice(ua: string | null): string {
   // Desktop. Note: iPads on iPadOS 13+ ask for desktop sites and report
   // themselves as a Mac, so they are described as one.
   if (osName === "Mac OS") return "Mac";
-  if (osName === "Windows") return "computador com Windows";
+  if (osName === "Windows") return "computador Windows";
   if (/^(Chrome|Chromium) OS$/.test(osName)) return "Chromebook";
   if (/Linux|Ubuntu|Debian|Fedora|Arch|Mint|Manjaro/i.test(osName)) {
-    return "computador com Linux";
+    return "computador Linux";
   }
   if (!device.type) return "computador";
 

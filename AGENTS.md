@@ -210,10 +210,19 @@ components **after** the page is known to exist (after any `notFound()`):
   speculative prefetch/prerender (`sec-purpose`) are skipped. Next `<Link>` prefetches don't render
   dynamic pages, so they're not counted (verified with a real browser: each visible link triggers
   two small `?_rsc=` prefetches, `/_tree` and route, and neither renders the page). Setting `prefetch={true}` on a `<Link>` would break that.
-- Each view is one document: `ts`, `meta.path`, `nav`, `device`, `browser`, `os`, `inApp` (Instagram,
-  Threads, Facebook, TikTok, LinkedIn, Twitter in-app browsers), `referrer` (domain only; `self` for
-  same-site full loads), `utm` (all five `utm_*` values), `clickIds` (values of `fbclid`, `igsh`,
-  `igshid`, `gclid`, ...), `visitor` (HMAC of IP + UA + UTC day; daily-unique only).
+- Each view is one document: `ts`, `meta.path`, `nav`, `device` (`unknown` when the parser has no
+  type and the OS isn't a desktop one), `browser` (in-app browsers are reported as the app:
+  `Instagram`, `Threads`, `Facebook`, `TikTok`, `LinkedIn`, `X`), `os`, `referrer` (domain only;
+  `self` for same-site full loads), `utm` (all five `utm_*` values, lowercased), `clickParams`
+  (names only of `fbclid`, `igsh`, `gclid`, ... present on the URL; values are never stored),
+  `source` (landing views only: normalized traffic source derived from the other fields by
+  `trafficSource`, e.g. `instagram`, `linkedin`, `google`; absent = direct/unknown), `visitor` (HMAC
+  of IP + UA + UTC day; daily-unique only). To count readers per source, group landing views by
+  `source`.
+- Documents written before 2026-11-21 have a different shape: a separate `inApp` field (lowercase app
+  name), `clickIds` with values instead of `clickParams`, unnormalized `utm` casing, no `source`, and
+  `device: "desktop"` for every unparsed device. Time-series documents can't easily be updated, so
+  queries spanning that date must handle both shapes.
 - Privacy: no raw IP, no analytics cookies. Keep it that way.
 - Retention: `pageviews` documents expire after 2 years (`RETENTION_SECONDS`, MongoDB TTL), as
   stated on the privacy page.

@@ -23,16 +23,23 @@ type PageView = {
   meta: { path: string };
   // "landing": full page load; "internal": in-app navigation.
   nav: "landing" | "internal";
+  // Landing views only. Normalized traffic source ("instagram", "linkedin",
+  // "google", or a raw domain / utm_source for anything unmapped), derived
+  // from the fields below by `trafficSource`. Absent = direct or unknown.
+  source?: string;
   // External referrer domain ("instagram.com"), or "self" when a full load
   // came from this site (refresh, new tab). Absent when there is none.
   referrer?: string;
+  // Lowercased values.
   utm?: Partial<Record<(typeof UTM_KEYS)[number], string>>;
-  // Ad/social click-ID params on the URL with their values, e.g.
-  // { igsh: "…" }. Group by value to count views per share/click.
-  clickIds?: Record<string, string>;
-  // Social app whose in-app browser opened the page.
-  inApp?: string;
+  // Names of ad/social click-ID params present on the URL, e.g. ["igsh"].
+  // Values are deliberately not stored (they identify a click or a sharer).
+  clickParams?: string[];
+  // "mobile", "tablet", "desktop", "smarttv", ... or "unknown".
   device: string;
+  // Parsed browser name; in-app browsers are reported as the app
+  // ("Instagram", "Threads", "LinkedIn", ...). The single source of truth for
+  // in-app detection (older documents also have a separate `inApp` field).
   browser?: string;
   os?: string;
   visitor?: string;
@@ -53,7 +60,8 @@ const UTM_KEYS = [
 ] as const;
 
 // fbclid: Facebook/Instagram ads & links; igsh/igshid: Instagram share links;
-// the rest: Google, TikTok, X, Microsoft, LinkedIn.
+// the rest: Google, TikTok, X, Microsoft, LinkedIn. Only their presence is
+// recorded (see `clickParams`).
 const CLICK_ID_KEYS = [
   "fbclid",
   "igsh",
@@ -65,14 +73,39 @@ const CLICK_ID_KEYS = [
   "li_fat_id",
 ];
 
+// In-app browsers, as reported in `browser`. Next's parser already names most
+// of them, but not consistently (or at all for Threads/X), so these win.
+// Threads first: its user agent may also carry Instagram's token.
 const IN_APP_BROWSERS: [RegExp, string][] = [
-  [/Instagram/i, "instagram"],
-  [/Barcelona/, "threads"],
-  [/FBAN|FBAV|FB_IAB|FBIOS/, "facebook"],
-  [/musical_ly|Bytedance|TikTok/i, "tiktok"],
-  [/LinkedInApp/i, "linkedin"],
-  [/Twitter/i, "twitter"],
+  [/Barcelona/, "Threads"],
+  [/Instagram/i, "Instagram"],
+  [/FBAN|FBAV|FB_IAB|FBIOS/, "Facebook"],
+  [/musical_ly|Bytedance|TikTok/i, "TikTok"],
+  [/LinkedInApp/i, "LinkedIn"],
+  [/Twitter/i, "X"],
 ];
+
+// Canonical traffic sources. Each matches utm_source values and referrer
+// hosts: a domain matches itself and its subdomains, and Android apps send
+// their package name as referrer ("android-app://com.linkedin.android/").
+const SOURCES: { source: string; utm: string[]; hosts: string[] }[] = [
+  { source: "threads", utm: ["threads"], hosts: ["threads.net", "threads.com", "com.instagram.barcelona"] },
+  { source: "instagram", utm: ["ig", "instagram"], hosts: ["instagram.com", "com.instagram.android"] },
+  { source: "facebook", utm: ["fb", "facebook"], hosts: ["facebook.com", "fb.com", "messenger.com", "com.facebook.katana", "com.facebook.orca"] },
+  { source: "linkedin", utm: ["linkedin", "li"], hosts: ["linkedin.com", "lnkd.in", "com.linkedin.android"] },
+  { source: "x", utm: ["x", "twitter"], hosts: ["x.com", "twitter.com", "t.co", "com.twitter.android"] },
+  { source: "tiktok", utm: ["tiktok"], hosts: ["tiktok.com", "com.zhiliaoapp.musically"] },
+  { source: "whatsapp", utm: ["whatsapp", "wa"], hosts: ["whatsapp.com", "wa.me", "com.whatsapp"] },
+  { source: "gmail", utm: ["gmail"], hosts: ["mail.google.com", "com.google.android.gm"] },
+  { source: "google", utm: ["google"], hosts: ["com.google.android.googlequicksearchbox"] },
+  { source: "reddit", utm: ["reddit"], hosts: ["reddit.com"] },
+  { source: "bing", utm: ["bing"], hosts: ["bing.com"] },
+  { source: "duckduckgo", utm: ["duckduckgo", "ddg"], hosts: ["duckduckgo.com"] },
+];
+
+// Desktop OSes: the parser leaves `device.type` empty for desktops, but also
+// for anything it doesn't recognize.
+const DESKTOP_OS = /^(Mac OS|Windows|Linux|Ubuntu|Debian|Fedora|Arch|Mint|Manjaro|Chrome OS|Chromium OS|FreeBSD|OpenBSD)$/i;
 
 const debug = (...args: unknown[]) => {
   if (process.env.ANALYTICS_DEBUG === "1") console.log("[analytics]", ...args);
@@ -122,13 +155,14 @@ export async function trackPageView(
     ts: new Date(),
     meta: { path },
     nav: isInternal ? "internal" : "landing",
-    device: parsed.device.type ?? "desktop",
+    device:
+      parsed.device.type ??
+      (DESKTOP_OS.test(parsed.os.name ?? "") ? "desktop" : "unknown"),
   };
-  if (parsed.browser.name) view.browser = parsed.browser.name;
+  const inApp = IN_APP_BROWSERS.find(([re]) => re.test(ua))?.[1];
+  const browser = inApp ?? parsed.browser.name;
+  if (browser) view.browser = browser;
   if (parsed.os.name) view.os = parsed.os.name;
-
-  const inApp = IN_APP_BROWSERS.find(([re]) => re.test(ua));
-  if (inApp) view.inApp = inApp[1];
 
   if (!isInternal) {
     const referrer = referrerDomain(h.get("referer"), h.get("host"));
@@ -136,17 +170,17 @@ export async function trackPageView(
 
     const utm: PageView["utm"] = {};
     for (const key of UTM_KEYS) {
-      const value = param(searchParams, key);
+      const value = param(searchParams, key)?.toLowerCase();
       if (value) utm[key] = value;
     }
     if (Object.keys(utm).length) view.utm = utm;
 
-    const clickIds: Record<string, string> = {};
-    for (const key of CLICK_ID_KEYS) {
-      // Present without a value (e.g. "?igsh") is still recorded.
-      if (key in searchParams) clickIds[key] = param(searchParams, key, 200) ?? "";
-    }
-    if (Object.keys(clickIds).length) view.clickIds = clickIds;
+    // Present without a value (e.g. "?igsh") still counts.
+    const clickParams = CLICK_ID_KEYS.filter((key) => key in searchParams);
+    if (clickParams.length) view.clickParams = clickParams;
+
+    const source = trafficSource(inApp, view.utm?.utm_source, clickParams, referrer);
+    if (source) view.source = source;
   }
 
   const visitor = visitorHash(h.get("x-forwarded-for") ?? h.get("x-real-ip"), ua);
@@ -173,6 +207,47 @@ function param(
   const raw = searchParams[key];
   const value = (Array.isArray(raw) ? raw[0] : raw)?.trim();
   return value ? value.slice(0, maxLength) : undefined;
+}
+
+// Ad click IDs that, alone, still say where the click came from.
+const CLICK_ID_SOURCES: Record<string, string> = {
+  igsh: "instagram",
+  igshid: "instagram",
+  gclid: "google",
+  ttclid: "tiktok",
+  twclid: "x",
+  msclkid: "bing",
+  li_fat_id: "linkedin",
+  // Added by both Facebook and Instagram outbound links, so ambiguous.
+  fbclid: "meta",
+};
+
+// Most to least reliable: the app the page opened in (observed), an explicit
+// utm_source, an Instagram share ID, the referrer, then other click IDs.
+// Unmapped utm_source values and referrer domains are kept as they are.
+function trafficSource(
+  inApp: string | undefined,
+  utmSource: string | undefined,
+  clickParams: string[],
+  referrer: string | undefined
+): string | undefined {
+  if (inApp) return inApp.toLowerCase();
+  if (utmSource) {
+    return SOURCES.find((s) => s.utm.includes(utmSource))?.source ?? utmSource;
+  }
+  if (clickParams.includes("igsh") || clickParams.includes("igshid")) {
+    return "instagram";
+  }
+  if (referrer && referrer !== "self") {
+    const known = SOURCES.find((s) =>
+      s.hosts.some((d) => referrer === d || referrer.endsWith(`.${d}`))
+    );
+    if (known) return known.source;
+    if (/(^|\.)google(\.[a-z]{2,3}){1,2}$/.test(referrer)) return "google";
+    return referrer;
+  }
+  const clickParam = clickParams.find((p) => p in CLICK_ID_SOURCES);
+  return clickParam && CLICK_ID_SOURCES[clickParam];
 }
 
 function referrerDomain(

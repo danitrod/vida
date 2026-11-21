@@ -59,10 +59,11 @@ export default async function PrivacyPage(props: {
             &quot;instagram.com&quot;);
           </li>
           <li>
-            parâmetros de campanha presentes no link (<code>utm_*</code>) e
-            identificadores de clique que redes sociais e anúncios adicionam aos
-            links, como <code>fbclid</code> (Facebook) e <code>igsh</code>{" "}
-            (Instagram);
+            parâmetros de campanha presentes no link (<code>utm_*</code>) e se
+            o link tinha identificadores de clique que redes sociais e anúncios
+            adicionam, como <code>fbclid</code> (Facebook) e{" "}
+            <code>igsh</code> (Instagram). Só o nome do parâmetro é guardado,
+            nunca o valor;
           </li>
           <li>
             um identificador diário, calculado a partir do endereço IP e do
