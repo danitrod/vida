@@ -17,7 +17,10 @@ privacy-friendly page-view analytics.
 - **Hearts** per post, for logged-in and anonymous readers
 - **Light/dark theme**, server-rendered from a cookie (no flash)
 - **Analytics**: one record per page view with time, path, device, referrer domain, UTM and
-  social click IDs (e.g. Instagram `igsh`), bot/prefetch filtering, and no stored IPs or tracking cookies
+  social click IDs (e.g. Instagram `igsh`), bot/prefetch filtering, and no stored IPs or tracking
+  cookies; kept for 2 years
+- **Privacy page** at `/privacidade` (linked in the footer); no third-party requests (fonts are
+  self-hosted) and only functional cookies, so no consent banner is needed
 
 ## Tech stack
 
@@ -91,6 +94,13 @@ Where the files go:
 
 To publish a draft with photos, move `src/content/drafts/<slug>.mdx` to `src/content/posts/` and the
 folder `src/content/drafts/<slug>/` to `public/posts/<slug>/`. The Markdown doesn't change.
+
+### Reader's device
+
+Write `<ReaderDevice />` anywhere in a post to show the reader's kind of device, e.g.
+`olhando para o seu <ReaderDevice />` becomes "olhando para o seu iPhone" (or "Mac",
+"celular Android", "computador com Windows"...). Unknown devices get "dispositivo". It's worked out
+on the server from the browser's user-agent and is never stored.
 
 ### Drafts
 

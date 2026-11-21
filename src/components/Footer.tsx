@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { FaInstagram } from "react-icons/fa";
 
 export default function Footer() {
@@ -12,6 +13,12 @@ export default function Footer() {
       >
         <FaInstagram className="w-5 h-5 text-foreground" />
       </a>
+      <Link
+        href="/privacidade"
+        className="mt-2 block text-xs opacity-50 hover:opacity-80"
+      >
+        privacidade
+      </Link>
     </footer>
   );
 }

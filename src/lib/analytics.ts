@@ -39,6 +39,10 @@ type PageView = {
 
 const COLLECTION = "pageviews";
 
+// Views are deleted automatically after 2 years (stated in the privacy page,
+// /privacidade). Keep both in sync.
+const RETENTION_SECONDS = 2 * 365 * 24 * 60 * 60;
+
 const UTM_KEYS = [
   "utm_source",
   "utm_medium",
@@ -206,12 +210,19 @@ async function pageViews() {
   ready ??= db
     .createCollection(COLLECTION, {
       timeseries: { timeField: "ts", metaField: "meta", granularity: "hours" },
+      expireAfterSeconds: RETENTION_SECONDS,
     })
     .then(() => undefined)
-    .catch((err) => {
-      if (err?.code === 48) return; // NamespaceExists: already created
-      ready = null;
-      throw err;
+    .catch(async (err) => {
+      if (err?.code !== 48) {
+        ready = null;
+        throw err;
+      }
+      // NamespaceExists: already created (possibly before retention was
+      // added). Make sure it expires old views; never block on failure.
+      await db
+        .command({ collMod: COLLECTION, expireAfterSeconds: RETENTION_SECONDS })
+        .catch((e) => console.error("Analytics retention update failed:", e));
     });
   await ready;
   return db.collection<PageView>(COLLECTION);

@@ -1,6 +1,7 @@
 import type { MDXComponents } from "mdx/types";
 import { FaExternalLinkAlt } from "react-icons/fa";
 import Photo from "@/components/photos/Photo";
+import ReaderDevice from "@/components/ReaderDevice";
 
 export function useMDXComponents(components: MDXComponents): MDXComponents {
   return {
@@ -17,6 +18,8 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     ),
     // Images are hidden until the reader turns on "Mostrar fotos".
     img: (props) => <Photo {...props} />,
+    // <ReaderDevice /> in a post: the reader's kind of device.
+    ReaderDevice,
     ...components,
   };
 }

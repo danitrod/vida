@@ -116,6 +116,12 @@ src/
   the same for both, so publishing = moving the `.mdx` to `posts/` and the photo folder to
   `public/posts/<slug>/`, without editing the Markdown. Never put draft photos in `public/`
   (committed, and so public). See "Post photos" below.
+- **`<ReaderDevice />`** can be used in any post (no import; registered in `mdx-components.tsx`).
+  It renders the reader's kind of device as a masculine noun ("iPhone", "Mac", "celular Android",
+  "computador com Windows", ...; "dispositivo" for unknown, bots and scripts), e.g.
+  `olhando para o seu <ReaderDevice />`. It's a server component using `describeDevice()` in
+  `src/lib/device.ts`, which only reads the `User-Agent` header during rendering. Keep it that
+  way: never store or log the result, and don't move detection to client-side JavaScript.
 - Post content and all UI copy are in Portuguese (pt-BR). UI strings are mostly lowercase
   ("enviar comentário", "fechar"). Keep that voice; don't translate content.
 
@@ -208,11 +214,38 @@ components **after** the page is known to exist (after any `notFound()`):
   same-site full loads), `utm` (all five `utm_*` values), `clickIds` (values of `fbclid`, `igsh`,
   `igshid`, `gclid`, ...), `visitor` (HMAC of IP + UA + UTC day; daily-unique only).
 - Privacy: no raw IP, no analytics cookies. Keep it that way.
+- Retention: `pageviews` documents expire after 2 years (`RETENTION_SECONDS`, MongoDB TTL), as
+  stated on the privacy page.
 - The write runs in `after()` and must never break or slow the page; errors are only logged.
 - If you add a new page that should be counted, call `trackPageView` in it.
 
+## Privacy
+
+The privacy policy is `src/app/privacidade/page.tsx` (Portuguese, linked from the footer). It
+describes exactly what the code collects, the cookies, legal bases, processors, retention and
+contact. **When a change affects any of that, update the page in the same change** and bump its
+`LAST_UPDATED` date. That includes new fields stored about readers or users, new or changed cookies,
+new third-party services or requests, and retention changes. Mention the update when reporting
+the change.
+
+Constraints the current policy (and the absence of a consent banner) depends on:
+
+- No third-party requests from readers' browsers: no CDN fonts, scripts, embeds or trackers.
+  Fonts are self-hosted with `next/font` (`layout.tsx`); loading Google Fonts directly would send
+  visitors' IPs to Google.
+- Only cookies needed for features the reader uses (login, anonymous comment/heart ownership,
+  chosen theme). Anything else (tracking, ads, analytics cookies) would need opt-in consent.
+- No client-side JavaScript reading device information for analytics or personalisation (EU
+  ePrivacy rules treat that as access to the device). Server-side use of request headers, not
+  stored, is fine (e.g. `ReaderDevice`).
+
+If a change would break one of these, stop and ask the maintainer first.
+
 ## Coding conventions
 
+- **Code is in English:** identifiers, file and component names, comments and commit messages
+  (e.g. `ReaderDevice`, not `SeuDispositivo`). Portuguese is only for reader-facing content: post
+  text, UI copy, API `message` strings and public URLs like `/privacidade`.
 - Path alias `@/*` → `src/*`.
 - Server-only logic lives in `src/lib`; don't import `lib/auth`, `lib/mongodb`, `lib/posts`,
   `lib/reactions` or `lib/analytics` from client components.
