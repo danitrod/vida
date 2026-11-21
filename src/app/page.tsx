@@ -2,14 +2,18 @@ import Link from "next/link";
 import { Metadata } from "next";
 import { getAllPosts } from "@/lib/posts";
 import { formatDate } from "@/lib/date";
+import { trackPageView } from "@/lib/analytics";
 
 export const metadata: Metadata = {
   title: "vida | by danitrod",
   description: "Pensamentos e histórias tirados de um bloco de notas.",
 };
 
-export default async function Home() {
+export default async function Home(props: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
   const posts = await getAllPosts();
+  await trackPageView("/", await props.searchParams);
 
   return (
     <main className="px-4 py-8 sm:px-8 md:px-16 lg:px-32 ">

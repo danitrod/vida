@@ -4,6 +4,7 @@ import Comments from "@/components/Comments";
 import Disclaimer from "@/components/Disclaimer";
 import HeartButton from "@/components/HeartButton";
 import { getLoveState } from "@/lib/reactions";
+import { trackPageView } from "@/lib/analytics";
 import { notFound } from "next/navigation";
 import { getAllPosts, loadPost } from "@/lib/posts";
 
@@ -30,11 +31,15 @@ export async function generateMetadata(props: {
 
 export default async function PostPage(props: {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const params = await props.params;
   const post = await loadPost(params.slug);
   if (!post) notFound();
   const { default: Post, metadata } = post;
+
+  // Only reached for posts that exist (notFound() above throws).
+  await trackPageView(`/posts/${params.slug}`, await props.searchParams);
 
   const { count: heartCount, loved: lovedByUser } = await getLoveState(
     params.slug

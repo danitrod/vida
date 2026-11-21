@@ -2,11 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
-import { cookies, headers } from "next/headers";
-import { after } from "next/server";
+import { cookies } from "next/headers";
 import { Theme } from "@/components/ThemeToggle";
 import { UserProvider } from "@/context/UserContext";
-import mongo, { mongoSafeKey } from "@/lib/mongodb";
 
 export const metadata: Metadata = {
   title: "vida",
@@ -19,52 +17,6 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const theme = await getTheme();
-  const headersList = await headers();
-
-  const ref = headersList.get("x-referrer");
-  const utm = headersList.get("x-utm-source");
-  const fbclid = headersList.get("x-has-fbclid") === "true";
-  const pathname = headersList.get("x-path");
-
-  if (pathname) {
-    const incFields: Record<string, number> = {
-      views: 1,
-    };
-
-    if (utm) {
-      incFields[`utm.${mongoSafeKey(utm)}`] = 1;
-    }
-
-    if (ref) {
-      incFields[`referrer.${mongoSafeKey(ref)}`] = 1;
-    }
-
-    if (fbclid) {
-      incFields["fbclid"] = 1;
-    }
-
-    // Record the view after the response is sent, so the page never waits
-    // on the database write.
-    after(async () => {
-      try {
-        await mongo.connect();
-        const db = mongo.db();
-        const analytics = db.collection("analytics");
-        await analytics.updateOne(
-          { path: pathname },
-          {
-            $inc: incFields,
-            $setOnInsert: { createdAt: new Date() },
-            $set: { updatedAt: new Date() },
-          },
-          { upsert: true }
-        );
-      } catch (err) {
-        console.error("Analytics error:", err);
-      }
-    });
-  }
-
   return (
     <html lang="pt-BR" className={theme === "dark" ? "dark" : ""}>
       <head>
