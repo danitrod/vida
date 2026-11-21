@@ -1,28 +1,29 @@
-import fs from "fs";
-import path from "path";
 import { Metadata } from "next";
 import { formatDate } from "@/lib/date";
 import Comments from "@/components/Comments";
+import Disclaimer from "@/components/Disclaimer";
 import HeartButton from "@/components/HeartButton";
 import { UserProvider } from "@/context/UserContext";
 import mongo from "@/lib/mongodb";
 import { validateAuth, validateAnonToken } from "@/lib/auth";
 import { notFound } from "next/navigation";
+import { getAllPosts, loadPost } from "@/lib/posts";
 
-const postsDir = path.join(process.cwd(), "src/content/posts");
+// Only slugs from generateStaticParams are served; any other slug 404s.
+export const dynamicParams = false;
 
 export async function generateStaticParams() {
-  const files = fs.readdirSync(postsDir);
-  return files.map((filename) => ({
-    slug: filename.replace(/\.mdx$/, ""),
-  }));
+  const posts = await getAllPosts();
+  return posts.map((post) => ({ slug: post.slug }));
 }
 
 export async function generateMetadata(props: {
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const params = await props.params;
-  const { metadata } = await import(`@/content/posts/${params.slug}.mdx`);
+  const post = await loadPost(params.slug);
+  if (!post) notFound();
+  const { metadata } = post;
   return {
     title: "vida | " + metadata.title,
     description: metadata.excerpt,
@@ -33,17 +34,9 @@ export default async function PostPage(props: {
   params: Promise<{ slug: string }>;
 }) {
   const params = await props.params;
-  let Post, metadata;
-  try {
-    const { default: postContent, metadata: postMetadata } = await import(
-      `@/content/posts/${params.slug}.mdx`
-    );
-    Post = postContent;
-    metadata = postMetadata;
-  } catch (err) {
-    console.error(err);
-    notFound();
-  }
+  const post = await loadPost(params.slug);
+  if (!post) notFound();
+  const { default: Post, metadata } = post;
 
   await mongo.connect();
   const db = mongo.db();
@@ -81,6 +74,7 @@ export default async function PostPage(props: {
             Com notas de {formatDate(metadata.notesDate)}
           </p>
         )}
+        {metadata.disclaimer && <Disclaimer text={metadata.disclaimer} />}
         <div
           className="prose prose-lg dark:prose-invert prose-neutral mt-8"
           style={

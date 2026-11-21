@@ -39,3 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# unpublished posts (repo is public)
+/src/content/drafts/*
+!/src/content/drafts/.gitkeep
