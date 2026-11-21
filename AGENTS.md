@@ -79,7 +79,7 @@ src/
   components/            UI (client components unless noted); forms/ holds modal forms
   content/
     posts/               Published posts (*.mdx)
-    drafts/              Git-ignored drafts (only .gitkeep is tracked)
+    drafts/              Git-ignored drafts (only .gitkeep is tracked); <slug>/ holds draft photos
   context/UserContext.tsx  Client-side current-user state (fetches /api/me)
   hooks/                 Client hooks (useAnonUid)
   lib/                   Server/shared logic: posts, auth, mongodb, reactions, analytics, validation, dates
@@ -110,6 +110,12 @@ src/
   output file tracing. Keep both properties if you touch this code.
 - `loadPost(slug)` is the single entry point for reading a post; `getAllPosts()` builds the list.
   The post route uses `dynamicParams = false`, so only slugs from `generateStaticParams` resolve.
+- **Photos:** Markdown images (`![alt](/posts/<slug>/1.jpg "optional caption")`) are rendered by
+  `components/photos/Photo` (mapped as `img` in `mdx-components.tsx`). Published photos live in
+  `public/posts/<slug>/`; draft photos in `src/content/drafts/<slug>/` (git-ignored). The URL is
+  the same for both, so publishing = moving the `.mdx` to `posts/` and the photo folder to
+  `public/posts/<slug>/`, without editing the Markdown. Never put draft photos in `public/`
+  (committed, and so public). See "Post photos" below.
 - Post content and all UI copy are in Portuguese (pt-BR). UI strings are mostly lowercase
   ("enviar comentário", "fechar"). Keep that voice; don't translate content.
 
@@ -122,6 +128,30 @@ src/
 - There is no `proxy.ts` (formerly `middleware.ts`). If you add one, remember Next strips its own
   router headers from the request a proxy sees.
 - Side effects that shouldn't delay the response use `after()` from `next/server`.
+
+## Post photos
+
+Photos are off by default so a post can be read as text first. `components/photos/PostPhotos.tsx`
+wraps the post body on the post page and provides the state; `Photo.tsx` renders each image.
+
+- A "Mostrar fotos" switch at the top shows or hides all photos. A "Ver fotos" link at the bottom
+  turns them on and scrolls to the first `[data-photo]` in the post. Both appear only when the post
+  contains a photo (CSS `:has` in `globals.css`), so posts without photos are unaffected.
+- Nothing is downloaded until the first switch-on: no `<img>` is rendered before that
+  (`activated`). After it, images stay mounted while hidden, so toggling again is instant.
+- Hidden photos collapse to zero height (grid `0fr`/`1fr` transition with opacity, disabled under
+  `prefers-reduced-motion`). A paragraph that only holds a photo loses its margins, so text-only
+  reading has no gaps.
+- `Photo` must only render inline elements (`<span>`): MDX puts images inside `<p>`, and a block
+  element there breaks hydration.
+- Plain `<img>` is used on purpose, because post photos have no known dimensions for `next/image`.
+  Export photos at a sensible web size (e.g. ≤ 2000px wide, compressed).
+- Outside `PostPhotos` (no provider) a `Photo` renders normally.
+- Draft photos are served by `src/app/posts/[slug]/[file]/route.dev.ts`. The `.dev.ts` extension
+  is only added to `pageExtensions` in the dev-server phase (`next.config.ts`), so the route
+  doesn't exist in production builds; it also checks `NODE_ENV` and only serves plain file names
+  with image extensions. Next serves `public/` files first, so published photos win. Use the
+  same `*.dev.ts` naming for any other dev-only route.
 
 ## Auth and identity
 
@@ -227,10 +257,26 @@ managed by Next (it rewrote `jsx` to `react-jsx` and added `.next/dev/types`); t
 
 ## Decisions
 
-Significant decisions are recorded as ADRs in `adr/`. Before changing architecture, data model,
-auth, analytics or content workflow, read the relevant ADRs; when making such a decision, add one.
+Major architectural decisions are recorded as ADRs in `adr/`. Read the relevant ADRs before
+changing what they cover.
+
+The bar for a new ADR is high: a hard-to-reverse choice that shapes the whole system, such as
+replacing the framework or database, changing how auth works, or restructuring the data model.
+Feature-level and workflow choices (how a feature is built, where files go, a new route or
+component) don't get an ADR; document them in this file or the README instead. Don't write an ADR
+on your own initiative: propose it and wait for the maintainer's agreement.
 
 - File name: `adr/NNNN-short-kebab-title.md`, numbered sequentially from `0001`.
 - Sections: **Title**, **Date**, **Status** (Proposed / Accepted / Superseded by NNNN),
   **Context**, **Decision**, **Consequences**.
 - Never rewrite an accepted ADR's decision; supersede it with a new one and update the old one's status.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+## This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->

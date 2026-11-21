@@ -103,6 +103,23 @@
   }
 }
 
+/*
+ * Post photos (components/photos). Controls only show when the post has at
+ * least one photo; a paragraph holding only a photo gets no margins, so
+ * hidden photos leave no gap in the text.
+ */
+.photo-controls {
+  display: none;
+}
+
+.post-photos:has([data-photo]) .photo-controls {
+  display: flex;
+}
+
+.post-photos p:has(> [data-photo]:only-child) {
+  margin: 0;
+}
+
 @layer base {
   html {
     background: var(--background);

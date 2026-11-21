@@ -2,6 +2,7 @@ import { Metadata } from "next";
 import { formatDate } from "@/lib/date";
 import Comments from "@/components/Comments";
 import Disclaimer from "@/components/Disclaimer";
+import PostPhotos from "@/components/photos/PostPhotos";
 import HeartButton from "@/components/HeartButton";
 import { getLoveState } from "@/lib/reactions";
 import { trackPageView } from "@/lib/analytics";
@@ -60,21 +61,23 @@ export default async function PostPage(props: {
           </p>
         )}
         {metadata.disclaimer && <Disclaimer text={metadata.disclaimer} />}
-        <div
-          className="prose prose-lg dark:prose-invert prose-neutral mt-8"
-          style={
-            {
-              "--tw-prose-body": "var(--foreground)",
-              "--tw-prose-headings": "var(--foreground)",
-              "--tw-prose-links": "var(--foreground)",
-              "--tw-prose-bold": "var(--foreground)",
-              "--tw-prose-quotes": "var(--foreground)",
-              "--tw-prose-quote-borders": "var(--foreground)",
-            } as React.CSSProperties
-          }
-        >
-          <Post />
-        </div>
+        <PostPhotos>
+          <div
+            className="prose prose-lg dark:prose-invert prose-neutral mt-8"
+            style={
+              {
+                "--tw-prose-body": "var(--foreground)",
+                "--tw-prose-headings": "var(--foreground)",
+                "--tw-prose-links": "var(--foreground)",
+                "--tw-prose-bold": "var(--foreground)",
+                "--tw-prose-quotes": "var(--foreground)",
+                "--tw-prose-quote-borders": "var(--foreground)",
+              } as React.CSSProperties
+            }
+          >
+            <Post />
+          </div>
+        </PostPhotos>
         <div className="mt-4 flex justify-center">
           <HeartButton
             initialCount={heartCount}

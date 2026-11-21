@@ -10,6 +10,8 @@ privacy-friendly page-view analytics.
 
 - **MDX posts** with title, excerpt, date, optional "notes from" date and optional disclaimer
 - **Drafts** kept out of git and out of production builds, previewable locally
+- **Opt-in photos**: posts read as text first; a "Mostrar fotos" switch reveals the photos, which
+  are only downloaded once a reader asks for them
 - **Accounts**: registration, login (username or email), settings, optional new-post emails opt-in
 - **Comments**: logged-in or anonymous; authors can edit and delete their own
 - **Hearts** per post, for logged-in and anonymous readers
@@ -70,11 +72,31 @@ export const metadata = {
 Texto do post em **Markdown**.
 ```
 
+### Photos
+
+Reference images with regular Markdown, using `/posts/<slug>/...` paths:
+
+```mdx
+![Descrição da foto](/posts/<slug>/1.jpg "Legenda opcional")
+```
+
+Photos stay hidden until the reader turns on **Mostrar fotos** at the top of the post (or uses
+**Ver fotos** at the end). The controls only appear on posts that have photos.
+
+Where the files go:
+
+- **Published post:** `public/posts/<slug>/`. This is committed, so the photos are public.
+- **Draft:** `src/content/drafts/<slug>/`, next to the draft. It's git-ignored and only served by
+  `pnpm dev`, at the same URLs.
+
+To publish a draft with photos, move `src/content/drafts/<slug>.mdx` to `src/content/posts/` and the
+folder `src/content/drafts/<slug>/` to `public/posts/<slug>/`. The Markdown doesn't change.
+
 ### Drafts
 
-Put work in progress in `src/content/drafts/`. That folder is git-ignored, and drafts only appear
-with `pnpm dev`. They are never part of a production build. To publish, move the file to
-`src/content/posts/`.
+Put work in progress in `src/content/drafts/` (photos in `src/content/drafts/<slug>/`). That folder
+is git-ignored, and drafts only appear with `pnpm dev`. They are never part of a production build.
+To publish, move the file to `src/content/posts/` (and its photos as described above).
 
 ## Project structure
 

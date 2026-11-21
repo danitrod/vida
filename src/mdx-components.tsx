@@ -1,5 +1,6 @@
 import type { MDXComponents } from "mdx/types";
 import { FaExternalLinkAlt } from "react-icons/fa";
+import Photo from "@/components/photos/Photo";
 
 export function useMDXComponents(components: MDXComponents): MDXComponents {
   return {
@@ -14,6 +15,8 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
         <FaExternalLinkAlt className="inline-block -mt-1 ml-1" size={8} />
       </a>
     ),
+    // Images are hidden until the reader turns on "Mostrar fotos".
+    img: (props) => <Photo {...props} />,
     ...components,
   };
 }
