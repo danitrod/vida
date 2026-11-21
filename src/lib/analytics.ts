@@ -106,9 +106,15 @@ export async function trackPageView(
 
   // Bots, crawlers and scripts. Every real browser (in-app ones included)
   // sends a "Mozilla/..." user agent; curl, wget, python-requests... do not.
+  // Headless/automation browsers (Puppeteer, Playwright, Lighthouse) aren't
+  // on Next's bot list but say so in the user agent.
   const ua = h.get("user-agent") ?? "";
   const parsed = userAgent({ headers: h });
-  if (!ua.startsWith("Mozilla/") || parsed.isBot) {
+  if (
+    !ua.startsWith("Mozilla/") ||
+    parsed.isBot ||
+    /Headless|Lighthouse|PhantomJS/i.test(ua)
+  ) {
     return debug("skip bot", ua, path);
   }
 

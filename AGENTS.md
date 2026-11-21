@@ -206,9 +206,10 @@ components **after** the page is known to exist (after any `notFound()`):
   client navigations (`nav: "internal"`) are counted. 404s and drafts never reach it.
 - Navigation type comes from Fetch Metadata headers: `sec-fetch-dest: document` = full load;
   `empty` + `sec-fetch-site: same-origin` = Next router fetch. Anything else is skipped, which
-  also filters most scripts. Bots (`userAgent().isBot`, or a UA not starting with `Mozilla/`) and
+  also filters most scripts. Bots (`userAgent().isBot`, a UA not starting with `Mozilla/`, or headless/automation browsers) and
   speculative prefetch/prerender (`sec-purpose`) are skipped. Next `<Link>` prefetches don't render
-  dynamic pages, so they're not counted. Setting `prefetch={true}` on a `<Link>` would break that.
+  dynamic pages, so they're not counted (verified with a real browser: each visible link triggers
+  two small `?_rsc=` prefetches, `/_tree` and route, and neither renders the page). Setting `prefetch={true}` on a `<Link>` would break that.
 - Each view is one document: `ts`, `meta.path`, `nav`, `device`, `browser`, `os`, `inApp` (Instagram,
   Threads, Facebook, TikTok, LinkedIn, Twitter in-app browsers), `referrer` (domain only; `self` for
   same-site full loads), `utm` (all five `utm_*` values), `clickIds` (values of `fbclid`, `igsh`,
