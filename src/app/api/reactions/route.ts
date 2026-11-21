@@ -1,6 +1,25 @@
 import { NextResponse } from "next/server";
 import mongo from "@/lib/mongodb";
 import { validateAuth, validateAnonToken, createAnonToken } from "@/lib/auth";
+import { getLoveState } from "@/lib/reactions";
+
+// Current heart state for the visitor; used to refresh after login/logout.
+export async function GET(req: Request) {
+  const post = new URL(req.url).searchParams.get("post");
+  if (!post) {
+    return NextResponse.json(
+      { message: "Post slug é obrigatório." },
+      { status: 400 }
+    );
+  }
+
+  try {
+    return NextResponse.json(await getLoveState(post));
+  } catch (err) {
+    console.error("Erro ao buscar reactions:", err);
+    return NextResponse.json({ message: "Erro interno" }, { status: 500 });
+  }
+}
 
 export async function POST(req: Request) {
   try {

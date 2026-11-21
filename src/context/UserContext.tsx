@@ -25,20 +25,32 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const fetchUser = async () => {
+  const loadUser = async (): Promise<User> => {
     try {
       const res = await fetch("/api/me");
       const data = await res.json();
-      setUser(data.user || null);
+      return data.user || null;
     } catch {
-      setUser(null);
-    } finally {
-      setIsLoading(false);
+      return null;
     }
   };
 
+  const fetchUser = async () => {
+    setUser(await loadUser());
+    setIsLoading(false);
+  };
+
+  // Initial load; state is only set once the request resolves.
   useEffect(() => {
-    fetchUser();
+    let ignore = false;
+    loadUser().then((loaded) => {
+      if (ignore) return;
+      setUser(loaded);
+      setIsLoading(false);
+    });
+    return () => {
+      ignore = true;
+    };
   }, []);
 
   return (

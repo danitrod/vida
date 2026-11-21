@@ -3,9 +3,7 @@ import { formatDate } from "@/lib/date";
 import Comments from "@/components/Comments";
 import Disclaimer from "@/components/Disclaimer";
 import HeartButton from "@/components/HeartButton";
-import { UserProvider } from "@/context/UserContext";
-import mongo from "@/lib/mongodb";
-import { validateAuth, validateAnonToken } from "@/lib/auth";
+import { getLoveState } from "@/lib/reactions";
 import { notFound } from "next/navigation";
 import { getAllPosts, loadPost } from "@/lib/posts";
 
@@ -38,27 +36,9 @@ export default async function PostPage(props: {
   if (!post) notFound();
   const { default: Post, metadata } = post;
 
-  await mongo.connect();
-  const db = mongo.db();
-
-  const user = await validateAuth();
-  let anonToken: string | null;
-  if (!user) {
-    anonToken = await validateAnonToken();
-  }
-
-  const reactions = await db
-    .collection("reactions")
-    .find({ post: params.slug, type: "love" })
-    .toArray();
-
-  const lovedByUser = reactions.some(
-    (r) =>
-      (r.user && r.user === user?.username) ||
-      (r.anonToken && r.anonToken === anonToken)
+  const { count: heartCount, loved: lovedByUser } = await getLoveState(
+    params.slug
   );
-
-  const heartCount = reactions.length;
 
   return (
     <main className="min-h-screen px-4 py-8 sm:px-8 md:px-16 lg:px-32 bg-[var(--background)] text-[var(--foreground)]">
@@ -91,18 +71,14 @@ export default async function PostPage(props: {
           <Post />
         </div>
         <div className="mt-4 flex justify-center">
-          <UserProvider>
-            <HeartButton
-              initialCount={heartCount}
-              initiallyLoved={lovedByUser}
-              postSlug={params.slug}
-            />
-          </UserProvider>
+          <HeartButton
+            initialCount={heartCount}
+            initiallyLoved={lovedByUser}
+            postSlug={params.slug}
+          />
         </div>
 
-        <UserProvider>
-          <Comments slug={params.slug} />
-        </UserProvider>
+        <Comments slug={params.slug} />
       </article>
     </main>
   );

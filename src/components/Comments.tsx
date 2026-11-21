@@ -20,9 +20,20 @@ export default function Comments({ slug }: CommentsProps) {
     setComments(data.comments);
   }, [slug]);
 
+  // Initial load. State is only set from the fetch callback, and a stale
+  // response is ignored if the slug changed in the meantime.
   useEffect(() => {
-    fetchComments();
-  }, [slug, fetchComments]);
+    let ignore = false;
+    fetch(`/api/comments?slug=${slug}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (!ignore) setComments(data.comments);
+      })
+      .catch((err) => console.error("Erro ao buscar comentários:", err));
+    return () => {
+      ignore = true;
+    };
+  }, [slug]);
 
   const handleDelete = async (id: string) => {
     fetch(`/api/comments/${id}`, { method: "DELETE" });

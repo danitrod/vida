@@ -4,7 +4,7 @@ export const config = {
   matcher: ["/", "/posts/:path*"],
 };
 
-export async function middleware(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   const path = req.nextUrl.pathname;
   if (path.startsWith("/_next")) {
     return NextResponse.next();

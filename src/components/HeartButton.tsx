@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
+import { useUser } from "@/context/UserContext";
 
 type Props = {
   initialCount: number;
@@ -18,6 +19,39 @@ export default function HeartButton({
   const [loves, setLoves] = useState(initialCount);
   const [animate, setAnimate] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
+
+  // The server-rendered state is for whoever loaded the page. When the user
+  // logs in or out without a reload, fetch the state for the new identity.
+  const { user, isLoading } = useUser();
+  const username = user?.username ?? null;
+  // Which identity the shown state belongs to (undefined: not known yet).
+  const loadedFor = useRef<string | null | undefined>(undefined);
+
+  useEffect(() => {
+    if (isLoading) return;
+    // First resolution of the user matches the server render; skip it.
+    if (loadedFor.current === undefined) {
+      loadedFor.current = username;
+      return;
+    }
+    if (loadedFor.current === username) return;
+    loadedFor.current = username;
+
+    let ignore = false;
+    fetch(`/api/reactions?post=${encodeURIComponent(postSlug)}`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((state) => {
+        if (ignore) return;
+        if (state) {
+          setLoved(state.loved);
+          setLoves(state.count);
+        }
+      })
+      .catch((err) => console.error("Erro ao buscar reactions:", err));
+    return () => {
+      ignore = true;
+    };
+  }, [isLoading, username, postSlug]);
 
   const handleClick = async () => {
     if (isSyncing) return;

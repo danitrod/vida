@@ -1,4 +1,4 @@
-export default {
+const config = {
   mongodb: {
     url: process.env.MONGODB_URI,
 
@@ -24,3 +24,5 @@ export default {
 
   moduleSystem: "commonjs",
 };
+
+export default config;

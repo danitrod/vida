@@ -13,26 +13,34 @@ export const Settings = ({ onClose }: FormProps) => {
   const [message, setMessage] = useState("");
   const [isEditingUsername, setIsEditingUsername] = useState(false);
 
-  useEffect(() => {
+  // When the user changes (e.g. after saving or logging out), sync the
+  // username and show the spinner while the full profile reloads. Adjusting
+  // state during render avoids an extra effect-driven render.
+  const [prevUser, setPrevUser] = useState(user);
+  if (user !== prevUser) {
+    setPrevUser(user);
     if (user?.username) setUsername(user.username);
+    setIsLoading(true);
+  }
 
-    const fetchExtra = async () => {
-      setIsLoading(true);
-      try {
-        const res = await fetch("/api/me/full");
+  useEffect(() => {
+    let ignore = false;
+    fetch("/api/me/full")
+      .then(async (res) => {
         const data = await res.json();
-        if (res.ok && data.user?.subscribeToPosts !== undefined) {
+        if (!ignore && res.ok && data.user?.subscribeToPosts !== undefined) {
           setSubscribe(data.user.subscribeToPosts);
         }
-      } catch (err) {
-        console.error("Erro ao buscar dados completos:", err);
-      } finally {
+      })
+      .catch((err) => console.error("Erro ao buscar dados completos:", err))
+      .finally(() => {
+        if (ignore) return;
         setIsLoading(false);
         setIsEditingUsername(false);
-      }
+      });
+    return () => {
+      ignore = true;
     };
-
-    fetchExtra();
   }, [user]);
 
   const handleSave = async (e: React.FormEvent) => {

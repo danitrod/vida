@@ -3,6 +3,7 @@ import "./globals.css";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import { cookies, headers } from "next/headers";
+import { after } from "next/server";
 import { Theme } from "@/components/ThemeToggle";
 import { UserProvider } from "@/context/UserContext";
 import mongo, { mongoSafeKey } from "@/lib/mongodb";
@@ -42,22 +43,26 @@ export default async function RootLayout({
       incFields["fbclid"] = 1;
     }
 
-    try {
-      await mongo.connect();
-      const db = mongo.db();
-      const analytics = db.collection("analytics");
-      await analytics.updateOne(
-        { path: pathname },
-        {
-          $inc: incFields,
-          $setOnInsert: { createdAt: new Date() },
-          $set: { updatedAt: new Date() },
-        },
-        { upsert: true }
-      );
-    } catch (err) {
-      console.error("Middleware error:", err);
-    }
+    // Record the view after the response is sent, so the page never waits
+    // on the database write.
+    after(async () => {
+      try {
+        await mongo.connect();
+        const db = mongo.db();
+        const analytics = db.collection("analytics");
+        await analytics.updateOne(
+          { path: pathname },
+          {
+            $inc: incFields,
+            $setOnInsert: { createdAt: new Date() },
+            $set: { updatedAt: new Date() },
+          },
+          { upsert: true }
+        );
+      } catch (err) {
+        console.error("Analytics error:", err);
+      }
+    });
   }
 
   return (
@@ -66,13 +71,15 @@ export default async function RootLayout({
         <link rel="icon" href="/favicon.ico" sizes="any" />
       </head>
       <body className="px-4 sm:px-8 md:px-16 lg:px-32">
-        <div className="max-w-4xl mx-auto py-4">
-          <UserProvider>
+        {/* One provider for the whole app, so logging in from the header
+            updates every component that reads the user (e.g. comments). */}
+        <UserProvider>
+          <div className="max-w-4xl mx-auto py-4">
             <Header initialTheme={theme} />
-          </UserProvider>
-          {children}
-          <Footer />
-        </div>
+            {children}
+            <Footer />
+          </div>
+        </UserProvider>
       </body>
     </html>
   );
