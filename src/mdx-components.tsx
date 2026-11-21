@@ -16,7 +16,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
         <FaExternalLinkAlt className="inline-block -mt-1 ml-1" size={8} />
       </a>
     ),
-    // Images are hidden until the reader turns on "Mostrar fotos".
+    // Images are hidden until the reader turns on "mostrar fotos".
     img: (props) => <Photo {...props} />,
     // <ReaderDevice /> in a post: the reader's kind of device.
     ReaderDevice,

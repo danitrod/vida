@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import { formatDate } from "@/lib/date";
 import Comments from "@/components/Comments";
 import Disclaimer from "@/components/Disclaimer";
-import PostPhotos from "@/components/photos/PostPhotos";
+import PostPhotos, { PhotoSwitch } from "@/components/photos/PostPhotos";
 import HeartButton from "@/components/HeartButton";
 import { getLoveState } from "@/lib/reactions";
 import { trackPageView } from "@/lib/analytics";
@@ -49,19 +49,24 @@ export default async function PostPage(props: {
   return (
     <main className="min-h-screen px-4 py-8 sm:px-8 md:px-16 lg:px-32 bg-background text-foreground">
       <article className="max-w-3xl mx-auto">
-        <h1 className="text-4xl font-extrabold tracking-tight mb-2">
-          {metadata.title}
-        </h1>
-        <p className="text-sm">
-          {formatDate(metadata.date)}
-        </p>
-        {metadata.notesDate && (
-          <p className="text-xs opacity-70 italic">
-            Com notas de {formatDate(metadata.notesDate)}
-          </p>
-        )}
-        {metadata.disclaimer && <Disclaimer text={metadata.disclaimer} />}
         <PostPhotos>
+          {/* The photo switch (only shown when the post has photos) sits at
+              the right of the title, vertically centered on it. */}
+          <div className="mb-2 flex items-center justify-between gap-4">
+            <h1 className="text-4xl font-extrabold tracking-tight">
+              {metadata.title}
+            </h1>
+            <PhotoSwitch />
+          </div>
+          <p className="text-sm">
+            {formatDate(metadata.date)}
+          </p>
+          {metadata.notesDate && (
+            <p className="text-xs opacity-70 italic">
+              Com notas de {formatDate(metadata.notesDate)}
+            </p>
+          )}
+          {metadata.disclaimer && <Disclaimer text={metadata.disclaimer} />}
           <div
             className="prose prose-lg dark:prose-invert prose-neutral mt-8"
             style={

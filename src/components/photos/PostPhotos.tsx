@@ -3,8 +3,8 @@
 import { createContext, useContext, useRef, useState } from "react";
 
 // Photos in a post are hidden by default so the text can be read on its own.
-// Readers opt in with the "Mostrar fotos" switch at the top (or the
-// "Ver fotos" link at the bottom).
+// Readers opt in with the "mostrar fotos" switch next to the title
+// (<PhotoSwitch />, placed by the page) or the "ver fotos" link at the bottom.
 //
 // - `shown`: photos currently visible.
 // - `activated`: photos were shown at least once. Until then no <img> is
@@ -13,11 +13,16 @@ import { createContext, useContext, useRef, useState } from "react";
 //
 // Outside a <PostPhotos> provider photos render normally (default value).
 
-type PhotosState = { shown: boolean; activated: boolean };
+type PhotosState = {
+  shown: boolean;
+  activated: boolean;
+  setVisible: (visible: boolean) => void;
+};
 
 const PhotosContext = createContext<PhotosState>({
   shown: true,
   activated: true,
+  setVisible: () => {},
 });
 
 export const usePhotos = () => useContext(PhotosContext);
@@ -54,48 +59,54 @@ export default function PostPhotos({
   };
 
   return (
-    <PhotosContext value={{ shown, activated }}>
+    <PhotosContext value={{ shown, activated, setVisible }}>
       {/* .photo-controls only appear when the post contains a photo
           (CSS :has, see globals.css), so posts without photos are unchanged. */}
       <div ref={rootRef} className="post-photos">
-        <div className="photo-controls mt-6">
-          <button
-            type="button"
-            role="switch"
-            aria-checked={shown}
-            onClick={() => setVisible(!shown)}
-            className="inline-flex items-center gap-3 text-sm"
-          >
-            <span
-              aria-hidden="true"
-              className={`relative inline-flex h-5 w-9 shrink-0 rounded-full transition-colors duration-200 motion-reduce:transition-none ${
-                shown
-                  ? "bg-[var(--color-accent)]"
-                  : "bg-gray-300 dark:bg-gray-600"
-              }`}
-            >
-              <span
-                className={`absolute left-0.5 top-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform duration-200 motion-reduce:transition-none ${
-                  shown ? "translate-x-4" : ""
-                }`}
-              />
-            </span>
-            Mostrar fotos
-          </button>
-        </div>
-
         {children}
 
-        <div className="photo-controls mt-8">
+        <div className="photo-controls mt-8 justify-center">
           <button
             type="button"
             onClick={goToPhotos}
             className="text-sm underline hover:opacity-80"
           >
-            Ver fotos
+            ver fotos
           </button>
         </div>
       </div>
     </PhotosContext>
+  );
+}
+
+// The show/hide switch. Must be inside <PostPhotos>; the page puts it in the
+// title row.
+export function PhotoSwitch() {
+  const { shown, setVisible } = usePhotos();
+
+  return (
+    <div className="photo-controls shrink-0">
+      <button
+        type="button"
+        role="switch"
+        aria-checked={shown}
+        onClick={() => setVisible(!shown)}
+        className="inline-flex items-center gap-3 whitespace-nowrap text-sm"
+      >
+        <span
+          aria-hidden="true"
+          className={`relative inline-flex h-5 w-9 shrink-0 rounded-full transition-colors duration-200 motion-reduce:transition-none ${
+            shown ? "bg-[var(--color-accent)]" : "bg-gray-300 dark:bg-gray-600"
+          }`}
+        >
+          <span
+            className={`absolute left-0.5 top-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform duration-200 motion-reduce:transition-none ${
+              shown ? "translate-x-4" : ""
+            }`}
+          />
+        </span>
+        mostrar fotos
+      </button>
+    </div>
   );
 }

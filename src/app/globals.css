@@ -116,8 +116,65 @@
   display: flex;
 }
 
-.post-photos p:has(> [data-photo]:only-child) {
+/* A paragraph holding only photos (one, or a row). Selectors ignore text
+   nodes, so the spaces between images on one Markdown line don't count;
+   that's also why paragraphs with a side photo (which usually hold text)
+   are excluded. */
+.post-photos
+  p:has(> [data-photo]):not(:has(> :not([data-photo]))):not(
+    :has(> [data-side])
+  ) {
   margin: 0;
+}
+
+/* Side photos (#direita / #esquerda): floated with the paragraph text
+   wrapping around them, on wider screens only. Full-width content (headings,
+   other photos, the end of the post) starts below any float. */
+.post-photos .prose {
+  display: flow-root;
+}
+
+@media (min-width: 640px) {
+  .post-photos [data-photo][data-side] {
+    width: 45%;
+  }
+
+  .post-photos [data-photo][data-side="right"] {
+    float: right;
+    margin-left: 1.5rem;
+  }
+
+  .post-photos [data-photo][data-side="left"] {
+    float: left;
+    margin-right: 1.5rem;
+  }
+
+  .post-photos .prose :is(h1, h2, h3, h4, hr, blockquote, pre, table),
+  .post-photos p:has(> [data-photo]:not([data-side])) {
+    clear: both;
+  }
+}
+
+/* Several photos in one paragraph: a row on wider screens, stacked on
+   phones. Each photo's flex-grow is its aspect ratio (set by Photo.tsx), so
+   widths are proportional to it and every photo gets the same height. */
+@media (min-width: 640px) {
+  .post-photos p:has(> [data-photo] + [data-photo]) {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .post-photos p:has(> [data-photo] + [data-photo]) > [data-photo] {
+    flex: var(--photo-aspect) 1 0;
+    min-width: 0;
+  }
+
+  /* In a row, width sets the height: drop the lone-photo cap and fill. */
+  .post-photos p:has(> [data-photo] + [data-photo]) img {
+    width: 100%;
+    max-height: none;
+  }
 }
 
 @layer base {

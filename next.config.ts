@@ -1,8 +1,15 @@
 import type { NextConfig } from "next";
 import { PHASE_DEVELOPMENT_SERVER } from "next/constants";
 import createMDX from "@next/mdx";
+import path from "node:path";
 
-const withMDX = createMDX({});
+// Plugins are given as absolute paths: Turbopack can't receive JavaScript
+// functions, and doesn't resolve relative ones from the project root.
+const withMDX = createMDX({
+  options: {
+    rehypePlugins: [path.resolve("src/lib/rehype-photo-layout.mjs")],
+  },
+});
 
 export default function config(phase: string): NextConfig {
   const isDevServer = phase === PHASE_DEVELOPMENT_SERVER;

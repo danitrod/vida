@@ -138,16 +138,31 @@ src/
 ## Post photos
 
 Photos are off by default so a post can be read as text first. `components/photos/PostPhotos.tsx`
-wraps the post body on the post page and provides the state; `Photo.tsx` renders each image.
+wraps the post (header and body) on the post page and provides the state; `Photo.tsx` renders each
+image.
 
-- A "Mostrar fotos" switch at the top shows or hides all photos. A "Ver fotos" link at the bottom
-  turns them on and scrolls to the first `[data-photo]` in the post. Both appear only when the post
+- A "mostrar fotos" switch (`PhotoSwitch`, placed by the page at the right of the title, vertically
+  centered on it) shows or hides all photos. A centered "ver fotos" link at the bottom turns them on
+  and scrolls to the first `[data-photo]` in the post. Both appear only when the post
   contains a photo (CSS `:has` in `globals.css`), so posts without photos are unaffected.
 - Nothing is downloaded until the first switch-on: no `<img>` is rendered before that
   (`activated`). After it, images stay mounted while hidden, so toggling again is instant.
 - Hidden photos collapse to zero height (grid `0fr`/`1fr` transition with opacity, disabled under
-  `prefers-reduced-motion`). A paragraph that only holds a photo loses its margins, so text-only
+  `prefers-reduced-motion`). A paragraph that only holds photos loses its margins, so text-only
   reading has no gaps.
+- Layout (`globals.css`, "Post photos"), never cropping:
+  - A lone photo is full width but capped at `80vh` and centered, so vertical photos fit the screen.
+  - Several images on one Markdown line (`![a](1.jpg) ![b](2.jpg)`) form a row from `sm` up, all at
+    the same height: each photo's `flex-grow` is its aspect ratio (`--photo-aspect`, read by `Photo`
+    on load). On phones they stack.
+  - `#direita` / `#esquerda` on the image URL (`![a](/posts/x/1.jpg#direita "legenda")`) floats the
+    photo at 45% width to that side, with the text of its paragraph wrapping around it. Put it at
+    the start of a long paragraph. Phones show it like a lone photo. Headings, other photos and the
+    end of the post clear the float. `Photo` strips the fragment and sets `data-side`. If the
+    paragraph has no text (the image is alone on its line, between blank lines), there's nothing
+    to wrap, so the rehype plugin `src/lib/rehype-photo-layout.mjs` (registered in
+    `next.config.ts` by absolute path, as Turbopack requires) drops the fragment at compile time
+    and the photo is centered like any lone photo.
 - `Photo` must only render inline elements (`<span>`): MDX puts images inside `<p>`, and a block
   element there breaks hydration.
 - Plain `<img>` is used on purpose, because post photos have no known dimensions for `next/image`.
