@@ -1,6 +1,7 @@
 import { createHmac } from "crypto";
 import { headers } from "next/headers";
 import { after, userAgent } from "next/server";
+import type { Db } from "mongodb";
 import mongo from "@/lib/mongodb";
 
 // Page view analytics.
@@ -218,12 +219,41 @@ async function pageViews() {
         ready = null;
         throw err;
       }
-      // NamespaceExists: already created (possibly before retention was
-      // added). Make sure it expires old views; never block on failure.
-      await db
-        .command({ collMod: COLLECTION, expireAfterSeconds: RETENTION_SECONDS })
-        .catch((e) => console.error("Analytics retention update failed:", e));
+      // NamespaceExists: already created, possibly before retention was
+      // added. Never block page views on this.
+      await ensureRetention(db).catch((e) =>
+        console.error("Analytics retention check failed:", e)
+      );
     });
   await ready;
   return db.collection<PageView>(COLLECTION);
+}
+
+// Adds the expiry to a collection created without it. Reading collection
+// options works with the app's read/write role; changing them (collMod)
+// needs an admin role, so when that's missing, log the one-time fix.
+async function ensureRetention(db: Db) {
+  const [info] = await db
+    .listCollections({ name: COLLECTION }, { nameOnly: false })
+    .toArray();
+  const current = (info as { options?: { expireAfterSeconds?: number } })
+    ?.options?.expireAfterSeconds;
+  if (current === RETENTION_SECONDS) return;
+
+  try {
+    await db.command({
+      collMod: COLLECTION,
+      expireAfterSeconds: RETENTION_SECONDS,
+    });
+  } catch (err) {
+    const code = (err as { code?: number }).code;
+    // 13: Unauthorized; 8000: Atlas permission error.
+    if (code !== 13 && code !== 8000) throw err;
+    console.warn(
+      `[analytics] "${db.databaseName}.${COLLECTION}" has no 2-year expiry and ` +
+        "this database user can't add it. Run once with an admin user:\n" +
+        `  use ${db.databaseName}\n` +
+        `  db.runCommand({ collMod: "${COLLECTION}", expireAfterSeconds: ${RETENTION_SECONDS} })`
+    );
+  }
 }
