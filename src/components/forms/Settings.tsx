@@ -80,7 +80,7 @@ export const Settings = ({ onClose }: FormProps) => {
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="w-full border border-gray-300 px-3 py-2 rounded text-sm"
+              className="w-full border border-gray-300 dark:border-gray-700 px-3 py-2 rounded text-sm"
             />
           ) : (
             <div className="flex items-center gap-2">
@@ -88,7 +88,7 @@ export const Settings = ({ onClose }: FormProps) => {
               <button
                 type="button"
                 onClick={() => setIsEditingUsername(true)}
-                className="text-gray-500 hover:text-gray-800"
+                className="text-gray-500 hover:text-gray-800 dark:hover:text-gray-200"
                 title="Editar nome de usuário"
               >
                 <FiEdit2 size={14} />

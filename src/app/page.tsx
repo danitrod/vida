@@ -35,10 +35,10 @@ export default async function Home(props: {
                 <h3 className="text-lg font-semibold group-hover:underline underline-offset-4">
                   {post.title}
                 </h3>
-                <p className="text-sm text-[var(--color-muted)] mt-1">
+                <p className="text-sm mt-1">
                   {post.excerpt}
                 </p>
-                <p className="text-xs text-[var(--color-muted)] mt-2 italic">
+                <p className="text-xs mt-2 italic">
                   {formatDate(post.date)}
                 </p>
               </Link>

@@ -3,18 +3,14 @@
 import { useState } from "react";
 import Modal from "./Modal";
 import Link from "next/link";
-import ThemeToggle, { Theme } from "./ThemeToggle";
+import ThemeToggle from "./ThemeToggle";
 import { RegistrationForm } from "./forms/Registration";
 import { LoginForm } from "./forms/Login";
 import { useUser } from "@/context/UserContext";
 import Spinner from "./Spinner";
 import { Settings } from "./forms/Settings";
 
-type HeaderProps = {
-  initialTheme?: Theme;
-};
-
-export default function Header({ initialTheme }: HeaderProps) {
+export default function Header() {
   const { user, isLoading } = useUser();
   const [modalContent, setModalContent] = useState<string | null>(null);
 
@@ -62,7 +58,7 @@ export default function Header({ initialTheme }: HeaderProps) {
       </Link>
 
       <div className="flex items-center gap-4">
-        <ThemeToggle initialTheme={initialTheme} />
+        <ThemeToggle />
         {isLoading ? (
           <Spinner />
         ) : user ? (

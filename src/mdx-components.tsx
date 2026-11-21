@@ -8,7 +8,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
         {...props}
         target="_blank"
         rel="noopener noreferrer"
-        className="text-[var(--color-orange)] underline hover:opacity-80 whitespace-nowrap"
+        className="underline hover:opacity-80 whitespace-nowrap"
       >
         {children}
         <FaExternalLinkAlt className="inline-block -mt-1 ml-1" size={8} />

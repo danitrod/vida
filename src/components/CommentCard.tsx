@@ -29,7 +29,7 @@ export default function CommentCard({
   return (
     <li
       key={comment._id}
-      className="border border-gray-200 p-4 rounded bg-white dark:bg-zinc-900"
+      className="border border-gray-200 dark:border-gray-700 p-4 rounded bg-white dark:bg-zinc-900"
     >
       {editing ? (
         <textarea
@@ -97,7 +97,7 @@ export default function CommentCard({
               </button>
               <button
                 onClick={() => setConfirmingDelete(true)}
-                className="text-red-400 hover:underline dark:text-red-900"
+                className="text-red-500 hover:underline dark:text-red-400"
               >
                 <FiTrash2 />
               </button>

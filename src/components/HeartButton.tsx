@@ -99,7 +99,7 @@ export default function HeartButton({
       ) : (
         <FaRegHeart className="w-5 h-5 text-gray-500" />
       )}
-      <span className={`text-sm ${loved ? "text-red-500" : "text-gray-500"}`}>
+      <span className={`text-sm ${loved ? "text-[var(--color-accent)]" : "text-gray-500"}`}>
         {loves}
       </span>
     </button>

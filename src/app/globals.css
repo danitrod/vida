@@ -2,9 +2,26 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
-@custom-variant dark (&:where(.dark, .dark *));
+/*
+ * Theme. <html> gets class "dark" or "light" when the reader picked one with
+ * the toggle (stored in the `theme` cookie and server-rendered, so there is
+ * no flash). With neither class, the device preference decides.
+ * Keep the two dark blocks below in sync.
+ */
+@custom-variant dark {
+  &:where(.dark, .dark *) {
+    @slot;
+  }
+  @media (prefers-color-scheme: dark) {
+    &:where(:root:not(.light) *) {
+      @slot;
+    }
+  }
+}
 
 :root {
+  color-scheme: light;
+
   --background: #fefcf8;
   --foreground: #2f2f2f;
 
@@ -17,10 +34,19 @@
   --color-light: #ecedef;
 }
 
+@media (prefers-color-scheme: dark) {
+  :root:not(.light) {
+    color-scheme: dark;
+    --background: #1a1a1a;
+    --foreground: #fefcf8;
+    --color-light: #343536;
+  }
+}
+
 .dark {
+  color-scheme: dark;
   --background: #1a1a1a;
   --foreground: #fefcf8;
-  --color-accent: #fa7850;
   --color-light: #343536;
 }
 

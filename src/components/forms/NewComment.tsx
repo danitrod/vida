@@ -52,7 +52,7 @@ export default function NewCommentForm({ postSlug, onCommentAdded }: Props) {
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="Seu nome (opcional)"
-          className="w-full border border-gray-300 px-3 py-2 rounded text-sm"
+          className="w-full border border-gray-300 dark:border-gray-700 px-3 py-2 rounded text-sm"
         />
       )}
       <textarea
@@ -60,7 +60,7 @@ export default function NewCommentForm({ postSlug, onCommentAdded }: Props) {
         onChange={(e) => setText(e.target.value)}
         placeholder="Escreva um comentário..."
         rows={4}
-        className="w-full border border-gray-300 px-3 py-2 rounded text-sm"
+        className="w-full border border-gray-300 dark:border-gray-700 px-3 py-2 rounded text-sm"
       />
       {error && <p className="text-sm text-red-600">{error}</p>}
       <button

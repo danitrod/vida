@@ -56,7 +56,7 @@ export function LoginForm({ onSwitch, onClose }: FormProps) {
           id="usernameOrEmail"
           type="text"
           placeholder="Usuário ou e-mail"
-          className="w-full border border-gray-300 px-3 py-2 rounded text-sm"
+          className="w-full border border-gray-300 dark:border-gray-700 px-3 py-2 rounded text-sm"
           value={usernameOrEmail}
           onChange={(e) => setUsernameOrEmail(e.target.value)}
         />
@@ -67,7 +67,7 @@ export function LoginForm({ onSwitch, onClose }: FormProps) {
           id="password"
           type="password"
           placeholder="Senha"
-          className="w-full border border-gray-300 px-3 py-2 rounded text-sm"
+          className="w-full border border-gray-300 dark:border-gray-700 px-3 py-2 rounded text-sm"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
@@ -83,7 +83,7 @@ export function LoginForm({ onSwitch, onClose }: FormProps) {
       <p className="mt-8 text-sm text-center">
         <button
           onClick={onSwitch}
-          className="underline text-[var(--color-foreground)]"
+          className="underline text-foreground"
         >
           crie sua conta
         </button>

@@ -18,7 +18,7 @@ export default async function RootLayout({
 }>) {
   const theme = await getTheme();
   return (
-    <html lang="pt-BR" className={theme === "dark" ? "dark" : ""}>
+    <html lang="pt-BR" className={theme ?? ""}>
       <head>
         <link rel="icon" href="/favicon.ico" sizes="any" />
       </head>
@@ -27,7 +27,7 @@ export default async function RootLayout({
             updates every component that reads the user (e.g. comments). */}
         <UserProvider>
           <div className="max-w-4xl mx-auto py-4">
-            <Header initialTheme={theme} />
+            <Header />
             {children}
             <Footer />
           </div>

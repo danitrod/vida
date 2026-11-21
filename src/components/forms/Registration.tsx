@@ -68,7 +68,7 @@ export const RegistrationForm = ({ onSwitch, onClose }: FormProps) => {
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           placeholder="Nome de usuário"
-          className="w-full border border-gray-300 px-3 py-2 rounded text-sm"
+          className="w-full border border-gray-300 dark:border-gray-700 px-3 py-2 rounded text-sm"
         />
         <label htmlFor="email" className="text-sm">
           seu e-mail
@@ -79,7 +79,7 @@ export const RegistrationForm = ({ onSwitch, onClose }: FormProps) => {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="Email"
-          className="w-full border border-gray-300 px-3 py-2 rounded text-sm"
+          className="w-full border border-gray-300 dark:border-gray-700 px-3 py-2 rounded text-sm"
         />
         <label htmlFor="password" className="text-sm">
           sua senha
@@ -90,7 +90,7 @@ export const RegistrationForm = ({ onSwitch, onClose }: FormProps) => {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           placeholder="Senha"
-          className="w-full border border-gray-300 px-3 py-2 rounded text-sm"
+          className="w-full border border-gray-300 dark:border-gray-700 px-3 py-2 rounded text-sm"
         />
         <label htmlFor="confirmPassword" className="text-sm">
           confirme sua senha
@@ -101,7 +101,7 @@ export const RegistrationForm = ({ onSwitch, onClose }: FormProps) => {
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
           placeholder="Confirme sua senha..."
-          className="w-full border border-gray-300 px-3 py-2 rounded text-sm"
+          className="w-full border border-gray-300 dark:border-gray-700 px-3 py-2 rounded text-sm"
         />
 
         <label className="flex items-center gap-2 text-sm">
@@ -128,7 +128,7 @@ export const RegistrationForm = ({ onSwitch, onClose }: FormProps) => {
       <p className="mt-8 text-sm text-center">
         <button
           onClick={onSwitch}
-          className="underline text-[var(--color-foreground)"
+          className="underline text-foreground"
         >
           já tem conta?
         </button>

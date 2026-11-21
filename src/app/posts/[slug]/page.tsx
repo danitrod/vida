@@ -46,16 +46,16 @@ export default async function PostPage(props: {
   );
 
   return (
-    <main className="min-h-screen px-4 py-8 sm:px-8 md:px-16 lg:px-32 bg-[var(--background)] text-[var(--foreground)]">
+    <main className="min-h-screen px-4 py-8 sm:px-8 md:px-16 lg:px-32 bg-background text-foreground">
       <article className="max-w-3xl mx-auto">
-        <h1 className="text-4xl font-extrabold tracking-tight text-[var(--color-carrot)] mb-2">
+        <h1 className="text-4xl font-extrabold tracking-tight mb-2">
           {metadata.title}
         </h1>
-        <p className="text-sm text-[var(--color-sand)]">
+        <p className="text-sm">
           {formatDate(metadata.date)}
         </p>
         {metadata.notesDate && (
-          <p className="text-xs text-[var(--color-sand)] opacity-70 italic">
+          <p className="text-xs opacity-70 italic">
             Com notas de {formatDate(metadata.notesDate)}
           </p>
         )}
@@ -65,11 +65,11 @@ export default async function PostPage(props: {
           style={
             {
               "--tw-prose-body": "var(--foreground)",
-              "--tw-prose-headings": "var(--color-carrot)",
-              "--tw-prose-links": "var(--color-orange)",
-              "--tw-prose-bold": "var(--color-orange)",
-              "--tw-prose-quotes": "var(--color-sand)",
-              "--tw-prose-quote-borders": "var(--color-sand)",
+              "--tw-prose-headings": "var(--foreground)",
+              "--tw-prose-links": "var(--foreground)",
+              "--tw-prose-bold": "var(--foreground)",
+              "--tw-prose-quotes": "var(--foreground)",
+              "--tw-prose-quote-borders": "var(--foreground)",
             } as React.CSSProperties
           }
         >
